@@ -19,13 +19,14 @@ server.on("request", (request, response) => {
       "Transfer-Encoding": "",
     });
     response.write("data: Connected\n\n");
-
-    console.log("response.length: ", response.length);
-    console.log("response.data: ", response.data);
     response.end();
-//    acceptNewClient(request, response);
-  } else {
-//    broadcastNewMessage(request, response);
+  }else if(request.method==="POST"){
+    console.log("method: post");
+    response.writeHead(200, {
+      "access-control-allow-origin": "http://localhost:3000",
+    });
+    response.write("data: XXXXXXX\n\n");
+    response.end();
   }
 });
 
