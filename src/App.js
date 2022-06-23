@@ -5,6 +5,8 @@ import { Container } from "@chakra-ui/react";
 import { Select, Textarea, Button } from "@chakra-ui/react";
 import axios from "axios";
 import { ulid } from "ulid";
+import {useNavigate} from "react-router-dom";
+import {Searching} from "./searching";
 
 const serverUrl = "http://localhost:8080";
 
@@ -103,35 +105,26 @@ function App() {
     setIsFilePicked(true);
   };
 
+  const navigate=useNavigate();
+
   const handleSubmit = () => {
     setGene(inputRefObject.current.value);
 
-    const param =
-      "{genome:" +
-      genome +
-      ",PAM:" +
-      pam +
-      ",gene:" +
-      inputRefObject.current.value +
-      ",file:" +
-      selectedFile +
-      "}";
-    console.log(param);
+    const params={genome:genome,pam:pam,gene:inputRefObject.current.value,file:selectedFile};
     const postData = async (newData) => {
+      navigate("/searching",{state:{params:params}});
       const response = await axios.post(serverUrl, newData);
-      return response;
-    };
-    const response = postData({ id: ulid(), content: param, done:false });
-    //    const response=async()=>{await axios.post(serverUrl,JSON.parse(param));}
-    const getData=async()=>{
-      const response=await axios.get(serverUrl);
-      return response;
-    };
-    const res = getData();
+      console.log("postData:response.data: ",response.data);
+      navigate("/result",{state:{params:params,data:response.data}});
 
+      return response;
+    };
+    const response = postData(params);
+  
+//    navigate("/searching",{state:{params:params,response:response}});
+
+    
     console.log("response.data: ", response.data);
-    console.log("res: ",res);
-    console.log("res.data: ", res.data);
   };
 
   console.log("genome:", genome);

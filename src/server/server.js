@@ -13,45 +13,41 @@ server.on("request", (request, response) => {
     console.log("method: ", "GET");
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
-//      Connection: "keep-alive",
-      "Cache-Control": "no-cache",
-      "access-control-allow-origin": "http://localhost:3000",
-      "Transfer-Encoding": "",
+      "Access-Control-Allow-Origin": "http://localhost:3000",
     });
     response.write("data: Connected\n\n");
     response.end();
-  }else if(request.method==="POST"){
-    console.log("method: post");
+  } else if (request.method === "POST") {
+    console.log("method: POST");
     response.writeHead(200, {
-      "access-control-allow-origin": "http://localhost:3000",
+      "Content-Type": "text/event-stream",
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Headers": "Content-Type",
     });
-    response.write("data: XXXXXXX\n\n");
+    let data = "";
+    request
+      .on("data", (chunk) => {
+        data += chunk;
+      })
+      .on("end", () => {
+        const params=JSON.parse(data);
+        console.log(data);
+        response.write(data);
+        response.end();
+      });
+    
+  } else {
+    response.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Cache-Control": "no-cache",
+      "Transfer-Encoding": "",
+    });
+    response.write("data: else\n");
     response.end();
+
+    console.log("else");
+    console.log(request.method);
   }
 });
-
-function acceptNewClient(request, response) {
-  clients.push(response);
-  request.connection.on("end", () => {
-    clients.splice(clients.indexOf(response), 1);
-    response.end();
-  });
-  response.writeHead(200, {
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-    "Cache-Control": "no-cache",
-  });
-  response.write("event: chat\ndata: Connected\n\n");
-}
-
-async function broadcastNewMessage(request, response) {
-  request.setEncoding("utf8");
-  let body = "";
-  for await (let chunk of request) {
-    body += chunk;
-  }
-  response.writeHead(200).end();
-  let message = "data: " + body.replace("\n", "\ndata: ");
-  let event = `event: chat\n${message}\n\n`;
-  clients.forEach((client) => client.write(event));
-}
