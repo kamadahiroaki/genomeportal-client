@@ -12,8 +12,8 @@ const serverUrl = "http://localhost:8080";
 
 const GenomeForm = ({ handleGenomeChange }) => {
   const options = [
-    { value: "GRCh38", label: "GRCh38" },
-    { value: "GRCh37", label: "GRCh37" },
+    { id:1, value: "GRCh38", label: "GRCh38" },
+    { id:2, value: "GRCh37", label: "GRCh37" },
   ];
   return (
     <>
@@ -26,7 +26,7 @@ const GenomeForm = ({ handleGenomeChange }) => {
           borderColor="gray.400"
         >
           {options.map((option) => (
-            <option value={option.value} key={ulid()}>
+            <option value={option.value} key={option.id}>
               {option.label}
             </option>
           ))}
@@ -38,9 +38,9 @@ const GenomeForm = ({ handleGenomeChange }) => {
 
 const PamForm = ({ handlePamChange }) => {
   const options = [
-    { value: "NGG", label: "20bp-NGG-Cas9" },
-    { value: "NNG", label: "20bp-NNG-Cas9" },
-    { value: "NGN", label: "20bp-NGN-Cas9" },
+    { id:1, value: "NGG", label: "20bp-NGG-Cas9" },
+    { id:2, value: "NNG", label: "20bp-NNG-Cas9" },
+    { id:3, value: "NGN", label: "20bp-NGN-Cas9" },
   ];
   return (
     <>
@@ -53,7 +53,7 @@ const PamForm = ({ handlePamChange }) => {
           borderColor="gray.400"
         >
           {options.map((option) => (
-            <option value={option.value} key={ulid()}>
+            <option value={option.value} key={option.id}>
               {option.label}
             </option>
           ))}
