@@ -25,8 +25,8 @@ const GenomeForm = ({ handleGenomeChange }) => {
           mb="4"
           borderColor="gray.400"
         >
-          {options.map((option, index) => (
-            <option value={option.value} key={index}>
+          {options.map((option) => (
+            <option value={option.value} key={ulid()}>
               {option.label}
             </option>
           ))}
@@ -52,8 +52,8 @@ const PamForm = ({ handlePamChange }) => {
           mb="4"
           borderColor="gray.400"
         >
-          {options.map((option, index) => (
-            <option value={option.value} key={index}>
+          {options.map((option) => (
+            <option value={option.value} key={ulid()}>
               {option.label}
             </option>
           ))}
