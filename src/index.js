@@ -1,25 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
-import Searching from "./searching"
+import { App } from "./App";
+import Searching from "./searching";
 import Result from "./result";
+import Urlnotify from "./urlnotify";
+import Jobresult from "./blast/jobresult";
+import Blastmain from "./blast/main";
+import Blastn from "./blast/blastn";
 import reportWebVitals from "./reportWebVitals";
 import theme from "./theme/theme";
 import { ChakraProvider } from "@chakra-ui/react";
-import {BrowserRouter,Routes,Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-      <Routes>
-        <Route exact path="/" element={<App />} />
-        <Route exact path="/App" element={<App />} />
-        <Route exact path="/searching" element={<Searching />} />
-        <Route exact path="/result" element={<Result />} />
-      </Routes>
+        <Routes>
+          <Route exact path="/" element={<App />} />
+          <Route exact path="/App" element={<App />} />
+          <Route exact path="/searching" element={<Searching />} />
+          <Route exact path="/result" element={<Result />} />
+          <Route exact path="/blast/jobresult" element={<Jobresult />} />
+          <Route exact path="/urlnotify" element={<Urlnotify />} />
+          <Route exact path="/blast/main" element={<Blastmain />} />
+          <Route exact path="/blast/blastn" element={<Blastn />} />
+        </Routes>
       </BrowserRouter>
     </ChakraProvider>
   </React.StrictMode>
