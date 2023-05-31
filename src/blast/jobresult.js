@@ -22,28 +22,32 @@ const Jobresult = () => {
     const timeout = 60;
     const fetchResultInterval = async (sec) => {
       console.log("url:", url);
-      await axios.get(url).then((res) => {
-        console.log("res.data:", res.data);
-        if (res.data === "") {
-          setText("no such job");
-        } else if (res.data.outjson != null) {
-          setText(res.data.outjson);
-          axios
-            .get(serverUrl + "/resultFile/?jobid=" + jobid)
-            .then((res) => {
-              setHtmlContent(res.data);
-            })
-            .catch((err) => {
-              console.log("err:", err);
-            });
-        } else if (sec > timeout / 2) {
-        } else {
-          setText("now calculating");
-          setTimeout(() => {
-            fetchResultInterval(sec * 1.2);
-          }, sec * 1000);
-        }
-      });
+      await axios
+        .get(url, { auth: { username: "admin", password: "admin" } })
+        .then((res) => {
+          console.log("res.data:", res.data);
+          if (res.data === "") {
+            setText("no such job");
+          } else if (res.data.outjson != null) {
+            setText(res.data.outjson);
+            axios
+              .get(serverUrl + "/resultFile/?jobid=" + jobid, {
+                auth: { username: "admin", password: "admin" },
+              })
+              .then((res) => {
+                setHtmlContent(res.data);
+              })
+              .catch((err) => {
+                console.log("err:", err);
+              });
+          } else if (sec > timeout / 2) {
+          } else {
+            setText("now calculating");
+            setTimeout(() => {
+              fetchResultInterval(sec * 1.2);
+            }, sec * 1000);
+          }
+        });
     };
     fetchResultInterval(5);
   }
