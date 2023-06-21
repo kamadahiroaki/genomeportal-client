@@ -60,10 +60,6 @@ function App() {
     <>
       <p>Response from Express API:{data}</p>
       <p>Response from Express API:{email}</p>
-      <Blast handleClick={() => navigate("/blast/blastn")} />
-      <Login handleClick={() => navigate("/login")} />
-      <LoginButton />
-      <LogoutButton />
     </>
   );
 }

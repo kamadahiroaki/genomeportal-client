@@ -287,16 +287,6 @@ function Blastn() {
           SUBMIT
         </Button>
       </Box>
-      <Center>
-        <Button
-          onClick={() => {
-            navigate("/");
-          }}
-          colorScheme="orange"
-        >
-          TOP
-        </Button>
-      </Center>
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import {
@@ -18,10 +18,16 @@ const LoginForm = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    axios.post("/api/login", { email, password }).then((res) => {
-      console.log(res);
-      navigate("/mypage");
-    });
+    axios
+      .post("/api/login", { email, password })
+      .then((res) => {
+        console.log(res);
+        navigate("/mypage");
+        window.location.reload();
+      })
+      .catch((err) => {
+        alert("login error");
+      });
     setEmail("");
     setPassword("");
   };
@@ -29,10 +35,28 @@ const LoginForm = () => {
   const handleSignup = (e) => {
     e.preventDefault();
     // Perform login logic here
-    axios.post("/api/signup", { email, password }).then((res) => {
-      console.log(res);
-      navigate("/");
-    });
+    axios
+      .post("/api/signup", { email, password })
+      .then((res) => {
+        console.log(res);
+        if (res.data === "signup error") {
+          alert("signup error");
+          return;
+        }
+        axios
+          .post("/api/login", { email, password })
+          .then((res) => {
+            navigate("/mypage");
+            window.location.reload();
+          })
+          .catch((err) => {
+            console.log(err);
+            navigate("/");
+          });
+      })
+      .catch((err) => {
+        alert("signup error");
+      });
     setEmail("");
     setPassword("");
   };
@@ -58,7 +82,7 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </FormControl>
-        <Button colorScheme="blue" type="submit" onClick={handleLogin}>
+        <Button colorScheme="twitter" type="submit" onClick={handleLogin}>
           Log In
         </Button>
         <Button colorScheme="green" type="submit" onClick={handleSignup}>
@@ -77,7 +101,7 @@ const LoginButton = () => {
     navigate("/login");
   };
   return (
-    <Button colorScheme="blue" onClick={handleLogin}>
+    <Button colorScheme="twitter" onClick={handleLogin}>
       Login
     </Button>
   );

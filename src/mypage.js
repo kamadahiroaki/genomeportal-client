@@ -11,6 +11,20 @@ import {
 } from "@chakra-ui/react";
 import { LoginButton, LogoutButton } from "./login";
 
+const MypageButton = () => {
+  const navigate = useNavigate();
+  return (
+    <Button
+      colorScheme="pink"
+      onClick={() => {
+        navigate("mypage");
+      }}
+    >
+      MyPage
+    </Button>
+  );
+};
+
 const Mypage = () => {
   const navigate = useNavigate();
 
@@ -19,18 +33,14 @@ const Mypage = () => {
     axios.get("/api/user").then((res) => {
       console.log("res.data:", res.data);
       setUser(res.data);
-      if (!user) {
+      console.log("user:", user);
+      if (!res.data) {
         navigate("/login");
       }
     });
   }, []);
 
-  return (
-    <>
-      Hello, {user}!
-      <LogoutButton />
-    </>
-  );
+  return <>Hello, {user}!</>;
 };
 
-export default Mypage;
+export { Mypage, MypageButton };
