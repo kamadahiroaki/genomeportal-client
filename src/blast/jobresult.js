@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Center } from "@chakra-ui/react";
-import { serverUrl } from "../App.js";
+import { serverUrl, clientAuth } from "../App.js";
 import axios from "axios";
 
 const Jobresult = () => {
@@ -22,32 +22,31 @@ const Jobresult = () => {
     const timeout = 60;
     const fetchResultInterval = async (sec) => {
       console.log("url:", url);
-      await axios
-        .get(url, { auth: { username: "admin", password: "admin" } })
-        .then((res) => {
-          console.log("res.data:", res.data);
-          if (res.data === "") {
-            setText("no such job");
-          } else if (res.data.outjson != null) {
-            setText(res.data.outjson);
-            axios
-              .get(serverUrl + "/resultFile/?jobid=" + jobid, {
-                auth: { username: "admin", password: "admin" },
-              })
-              .then((res) => {
-                setHtmlContent(res.data);
-              })
-              .catch((err) => {
-                console.log("err:", err);
-              });
-          } else if (sec > timeout / 2) {
-          } else {
-            setText("now calculating");
-            setTimeout(() => {
-              fetchResultInterval(sec * 1.2);
-            }, sec * 1000);
-          }
-        });
+      console.log("clientAuth:", clientAuth);
+      await axios.get(url, { auth: clientAuth }).then((res) => {
+        console.log("res.data:", res.data);
+        if (res.data === "") {
+          setText("no such job");
+        } else if (res.data.outjson != null) {
+          setText(res.data.outjson);
+          axios
+            .get(serverUrl + "/resultFile/?jobid=" + jobid, {
+              auth: clientAuth,
+            })
+            .then((res) => {
+              setHtmlContent(res.data);
+            })
+            .catch((err) => {
+              console.log("err:", err);
+            });
+        } else if (sec > timeout / 2) {
+        } else {
+          setText("now calculating");
+          setTimeout(() => {
+            fetchResultInterval(sec * 1.2);
+          }, sec * 1000);
+        }
+      });
     };
     fetchResultInterval(5);
   }

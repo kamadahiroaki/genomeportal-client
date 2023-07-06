@@ -8,7 +8,13 @@ import { ulid } from "ulid";
 import { useNavigate } from "react-router-dom";
 import { LoginForm, LoginButton, LogoutButton } from "./login";
 
-const serverUrl = "http://localhost:8080";
+//const serverUrl = "http://localhost:8080";
+//const clientAuth = { username: "client", password: "client" };
+const serverUrl = process.env.REACT_APP_SERVER_URL;
+const clientAuth = {
+  username: process.env.REACT_APP_TEST_CLIENT_USERNAME,
+  password: process.env.REACT_APP_TEST_CLIENT_PASSWORD,
+};
 
 const Blast = ({ handleClick }) => {
   return (
@@ -64,4 +70,4 @@ function App() {
   );
 }
 
-export { App, serverUrl };
+export { App, serverUrl, clientAuth };
