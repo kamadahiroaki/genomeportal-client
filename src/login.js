@@ -9,6 +9,7 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
+import { serverUrl, clientAuth } from "./App.js";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -17,9 +18,11 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = (e) => {
+    console.log("serverUrl:", serverUrl);
+    console.log("clientAuth:", clientAuth);
     e.preventDefault();
     axios
-      .post("/api/login", { email, password })
+      .post(serverUrl + "/api/login", { email, password }, { auth: clientAuth })
       .then((res) => {
         console.log(res);
         navigate("/mypage");
@@ -36,7 +39,11 @@ const LoginForm = () => {
     e.preventDefault();
     // Perform login logic here
     axios
-      .post("/api/signup", { email, password })
+      .post(
+        serverUrl + "/api/signup",
+        { email, password },
+        { auth: clientAuth }
+      )
       .then((res) => {
         console.log(res);
         if (res.data === "signup error") {
@@ -44,7 +51,11 @@ const LoginForm = () => {
           return;
         }
         axios
-          .post("/api/login", { email, password })
+          .post(
+            serverUrl + "/api/login",
+            { email, password },
+            { auth: clientAuth }
+          )
           .then((res) => {
             navigate("/mypage");
             window.location.reload();
@@ -109,7 +120,7 @@ const LoginButton = () => {
 const LogoutButton = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
-    axios.get("/api/logout").then((res) => {
+    axios.get(serverUrl + "/api/logout", { auth: clientAuth }).then((res) => {
       console.log(res);
       navigate("/");
       window.location.reload();

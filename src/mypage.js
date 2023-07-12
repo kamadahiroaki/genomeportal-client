@@ -9,7 +9,7 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
-import { LoginButton, LogoutButton } from "./login";
+import { serverUrl, clientAuth } from "./App.js";
 
 const MypageButton = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const Mypage = () => {
 
   const [user, setUser] = useState("");
   useEffect(() => {
-    axios.get("/api/user").then((res) => {
+    axios.get(serverUrl + "/api/user", { auth: clientAuth }).then((res) => {
       console.log("res.data:", res.data);
       setUser(res.data);
       console.log("user:", user);

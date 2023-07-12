@@ -5,12 +5,13 @@ import { Box, Flex, Spacer, Button, Text } from "@chakra-ui/react";
 import { LoginButton, LogoutButton } from "./login";
 import { MypageButton } from "./mypage";
 import { buildQueries } from "@testing-library/react";
+import { serverUrl, clientAuth } from "./App.js";
 
 const Header = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   useEffect(() => {
-    axios.get("/api/user").then((res) => {
+    axios.get(serverUrl + "/api/user", { auth: clientAuth }).then((res) => {
       setEmail(res.data);
     });
   }, []);

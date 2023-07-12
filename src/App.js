@@ -49,14 +49,14 @@ function App() {
 
   const [data, setData] = useState("");
   useEffect(() => {
-    axios.get("/api/data").then((res) => {
+    axios.get(serverUrl + "/api/data", { auth: clientAuth }).then((res) => {
       setData(res.data.message);
     });
   }, []);
 
   const [email, setEmail] = useState("");
   useEffect(() => {
-    axios.get("/api/user").then((res) => {
+    axios.get(serverUrl + "/api/user", { auth: clientAuth }).then((res) => {
       console.log("res.data:", res.data);
       setEmail(res.data);
     });
