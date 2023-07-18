@@ -6,7 +6,7 @@ import axios from "axios";
 import { ulid } from "ulid";
 import { useNavigate } from "react-router-dom";
 import { Searching } from "../searching";
-import { serverUrl, clientAuth } from "../App.js";
+import { serverUrl } from "../App.js";
 import {
   ProgramForm,
   QuerySequenceForm,
@@ -207,7 +207,6 @@ function Blastn() {
       //      navigate("/searching", { state: { params: params } });
       const response = await axios.post(serverUrl + "/jobSubmit", newData, {
         headers: { "Content-Type": "multipart/form-data" },
-        auth: clientAuth,
         withCredentials: true,
       });
       return response;

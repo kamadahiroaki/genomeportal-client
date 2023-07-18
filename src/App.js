@@ -11,10 +11,6 @@ import { LoginForm, LoginButton, LogoutButton } from "./login";
 //const serverUrl = "http://localhost:8080";
 //const clientAuth = { username: "client", password: "client" };
 const serverUrl = process.env.REACT_APP_SERVER_URL;
-const clientAuth = {
-  username: process.env.REACT_APP_TEST_CLIENT_USERNAME,
-  password: process.env.REACT_APP_TEST_CLIENT_PASSWORD,
-};
 
 const Blast = ({ handleClick }) => {
   return (
@@ -49,14 +45,14 @@ function App() {
 
   const [data, setData] = useState("");
   useEffect(() => {
-    axios.get(serverUrl + "/api/data", { auth: clientAuth }).then((res) => {
+    axios.get(serverUrl + "/api/data").then((res) => {
       setData(res.data.message);
     });
   }, []);
 
   const [email, setEmail] = useState("");
   useEffect(() => {
-    axios.get(serverUrl + "/api/user", { auth: clientAuth }).then((res) => {
+    axios.get(serverUrl + "/api/user").then((res) => {
       console.log("res.data:", res.data);
       setEmail(res.data);
     });
@@ -70,4 +66,4 @@ function App() {
   );
 }
 
-export { App, serverUrl, clientAuth };
+export { App, serverUrl };
