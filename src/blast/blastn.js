@@ -207,7 +207,6 @@ function Blastn() {
       //      navigate("/searching", { state: { params: params } });
       const response = await axios.post(serverUrl + "/jobSubmit", newData, {
         headers: { "Content-Type": "multipart/form-data" },
-        auth: { username: "admin", password: "admin" },
         withCredentials: true,
       });
       return response;
@@ -287,16 +286,6 @@ function Blastn() {
           SUBMIT
         </Button>
       </Box>
-      <Center>
-        <Button
-          onClick={() => {
-            navigate("/");
-          }}
-          colorScheme="orange"
-        >
-          TOP
-        </Button>
-      </Center>
     </>
   );
 }

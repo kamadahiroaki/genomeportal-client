@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { App } from "./App";
+import { LoginForm } from "./login";
+import { Header, Footer } from "./layout";
+import { Mypage } from "./mypage";
 import Searching from "./searching";
 import Result from "./result";
 import Urlnotify from "./urlnotify";
@@ -18,9 +21,14 @@ root.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <BrowserRouter>
+        <header>
+          <Header />
+        </header>
         <Routes>
           <Route exact path="/" element={<App />} />
           <Route exact path="/App" element={<App />} />
+          <Route exact path="/login" element={<LoginForm />} />
+          <Route exact path="/mypage" element={<Mypage />} />
           <Route exact path="/searching" element={<Searching />} />
           <Route exact path="/result" element={<Result />} />
           <Route exact path="/blast/jobresult" element={<Jobresult />} />

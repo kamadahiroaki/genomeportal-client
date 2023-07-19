@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Center } from "@chakra-ui/react";
 import { serverUrl } from "../App.js";
@@ -16,14 +16,14 @@ const Jobresult = () => {
   if (jobid == null) {
     setText("no such job");
   } else {
-    const jobUrl = "/blast/jobresult/?jobid=" + jobid;
+    const jobUrl = "/jobResult?jobid=" + jobid;
     const url = serverUrl + jobUrl;
 
     const timeout = 60;
     const fetchResultInterval = async (sec) => {
       console.log("url:", url);
       await axios
-        .get(url, { auth: { username: "admin", password: "admin" } })
+        .get(url)
         .then((res) => {
           console.log("res.data:", res.data);
           if (res.data === "") {
@@ -31,9 +31,7 @@ const Jobresult = () => {
           } else if (res.data.outjson != null) {
             setText(res.data.outjson);
             axios
-              .get(serverUrl + "/resultFile/?jobid=" + jobid, {
-                auth: { username: "admin", password: "admin" },
-              })
+              .get(serverUrl + "/resultFile?jobid=" + jobid)
               .then((res) => {
                 setHtmlContent(res.data);
               })
@@ -47,8 +45,12 @@ const Jobresult = () => {
               fetchResultInterval(sec * 1.2);
             }, sec * 1000);
           }
+        })
+        .catch((err) => {
+          console.log("err:", err);
         });
     };
+
     fetchResultInterval(5);
   }
 
@@ -67,30 +69,6 @@ const Jobresult = () => {
           <p>text:{text}</p>
         </div>
       )}
-
-      <Center>
-        <Button
-          onClick={() => {
-            navigate("/blast/blastn");
-          }}
-          colorScheme="blue"
-          mt="8"
-          mb="8"
-        >
-          BLAST TOP
-        </Button>
-      </Center>
-
-      <Center>
-        <Button
-          onClick={() => {
-            navigate("/");
-          }}
-          colorScheme="orange"
-        >
-          TOP
-        </Button>
-      </Center>
     </div>
   );
 };
