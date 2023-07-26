@@ -157,7 +157,13 @@ const proxyOptions = {
   target: queueingServerUrl,
   changeOrigin: true,
   onProxyReq: (proxyReq, req, res) => {
-    console.log("onProxyReq");
+    if (req.isAuthenticated()) {
+      proxyReq.setHeader("user", req.user);
+    } else {
+      proxyReq.setHeader("user", "");
+    }
+
+    //    console.log("onProxyReq");
     const encodedCredentials = Buffer.from(
       `${master.username}:${master.password}`
     ).toString("base64");
@@ -169,15 +175,18 @@ const proxyOptions = {
       proxyReq.setHeader("Content-Type", req.get("Content-Type"));
       proxyReq.setHeader("Content-Length", req.get("Content-Length"));
 
+      console.log("multipart/form-data");
       // フォームデータのボディをそのままプロキシにパイプ
       //        req.pipe(proxyReq);
     } else if (req.body && typeof req.body === "object") {
+      console.log("object");
       // リクエストボディがオブジェクト形式の場合、JSON形式に変換してプロキシに書き込む
       const jsonData = JSON.stringify(req.body);
       proxyReq.setHeader("Content-Type", "application/json");
       proxyReq.setHeader("Content-Length", Buffer.byteLength(jsonData));
       proxyReq.write(jsonData);
     } else if (req.body && typeof req.body === "string") {
+      console.log("string");
       // リクエストボディが文字列形式の場合、そのままプロキシに書き込む
       proxyReq.write(req.body);
     }
@@ -187,7 +196,7 @@ const proxyOptions = {
   },
 };
 app.use(
-  ["/jobSubmit", "/jobResult", "/resultFile"],
+  ["/jobSubmit", "/jobResult", "/resultFile", "/usersJobs"],
   createProxyMiddleware(proxyOptions)
 );
 
