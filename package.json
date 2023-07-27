@@ -63,12 +63,6 @@
     "web-vitals": "^2.1.0",
     "webpack": "^5.88.2"
   },
-   "oldscripts": {
-     "start": "react-scripts start",
-     "build": "react-scripts build",
-     "test": "react-scripts test",
-     "eject": "react-scripts eject"
-   },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
