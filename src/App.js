@@ -12,34 +12,6 @@ import { LoginForm, LoginButton, LogoutButton } from "./login";
 //const clientAuth = { username: "client", password: "client" };
 const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-const Blast = ({ handleClick }) => {
-  return (
-    <>
-      <div>
-        <label>
-          <Button onClick={handleClick} colorScheme="blue" size="lg">
-            BLAST
-          </Button>
-        </label>
-      </div>
-    </>
-  );
-};
-
-const Login = ({ handleClick }) => {
-  return (
-    <>
-      <div>
-        <label>
-          <Button onClick={handleClick} colorScheme="blue" size="lg">
-            LOGIN
-          </Button>
-        </label>
-      </div>
-    </>
-  );
-};
-
 function App() {
   const navigate = useNavigate();
 

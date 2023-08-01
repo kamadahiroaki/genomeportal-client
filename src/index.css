@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* index.css */
+/* 未訪問のリンクのスタイル */
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+/* 訪問済みのリンクのスタイル */
+a:visited {
+  color: purple;
+}

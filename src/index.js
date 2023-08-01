@@ -5,11 +5,7 @@ import { App } from "./App";
 import { LoginForm } from "./login";
 import { Header, Footer } from "./layout";
 import { Mypage } from "./mypage";
-import Searching from "./searching";
-import Result from "./result";
-import Urlnotify from "./urlnotify";
 import Jobresult from "./blast/jobresult";
-import Blastmain from "./blast/main";
 import Blastn from "./blast/blastn";
 import reportWebVitals from "./reportWebVitals";
 import theme from "./theme/theme";
@@ -29,11 +25,7 @@ root.render(
           <Route exact path="/App" element={<App />} />
           <Route exact path="/login" element={<LoginForm />} />
           <Route exact path="/mypage" element={<Mypage />} />
-          <Route exact path="/searching" element={<Searching />} />
-          <Route exact path="/result" element={<Result />} />
           <Route exact path="/blast/jobresult" element={<Jobresult />} />
-          <Route exact path="/urlnotify" element={<Urlnotify />} />
-          <Route exact path="/blast/main" element={<Blastmain />} />
           <Route exact path="/blast/blastn" element={<Blastn />} />
         </Routes>
       </BrowserRouter>

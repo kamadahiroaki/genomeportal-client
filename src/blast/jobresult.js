@@ -19,7 +19,7 @@ const Jobresult = () => {
     const jobUrl = "/jobResult?jobid=" + jobid;
     const url = serverUrl + jobUrl;
 
-    const timeout = 60;
+    const timeout = 3600 * 24 * 7;
     const fetchResultInterval = async (sec) => {
       console.log("url:", url);
       await axios
@@ -38,11 +38,11 @@ const Jobresult = () => {
               .catch((err) => {
                 console.log("err:", err);
               });
-          } else if (sec > timeout / 2) {
+          } else if (sec > timeout) {
           } else {
             setText("now calculating");
             setTimeout(() => {
-              fetchResultInterval(sec * 1.2);
+              fetchResultInterval((sec + 5) * 1.2);
             }, sec * 1000);
           }
         })

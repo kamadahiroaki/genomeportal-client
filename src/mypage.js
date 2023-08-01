@@ -9,9 +9,18 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import {
+  TableContainer,
+  Table,
+  TableCaption,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import { serverUrl } from "./App.js";
-import { use } from "passport";
 
 const MypageButton = () => {
   const navigate = useNavigate();
@@ -36,26 +45,46 @@ const getCookie = (name) => {
   }
 };
 
-const TableComponent = ({ data }) => {
+const JobHistoryTable = ({ data }) => {
   return (
-    <Table variant="simple">
-      <Thead>
-        <Tr>
-          <Th>Job ID</Th>
-          <Th>Submitted</Th>
-          {/* Add more headers as needed */}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {data.map((item, index) => (
-          <Tr key={index}>
-            <Td>{item.jobid}</Td>
-            <Td>{item.submitted}</Td>
-            {/* Add more cells with corresponding data properties as needed */}
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
+    <Box
+      margin="2"
+      borderWidth="1px"
+      borderColor="gray.200"
+      borderRadius="lg"
+      minW="fit-content"
+    >
+      <TableContainer>
+        <Table variant="simple">
+          <TableCaption placement="top">Job History</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Job ID</Th>
+              <Th>Job Title</Th>
+              <Th>Submitted</Th>
+              {/* Add more headers as needed */}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {data.map((item, index) => (
+              <Tr key={index}>
+                <Td fontFamily="Consolas, monospace">
+                  <Link
+                    to={`${serverUrl}/blast/jobresult?jobid=${item.jobid}`}
+                    className="link"
+                  >
+                    {item.jobid}
+                  </Link>
+                </Td>
+                <Td>{JSON.parse(item.injson).jobTitle}</Td>
+                <Td>{new Date(item.submitted).toLocaleString()}</Td>
+                {/* Add more cells with corresponding data properties as needed */}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 
@@ -78,7 +107,7 @@ const ViewJobHistory = () => {
   return (
     <div>
       <div>
-        {jobHistory.length > 0 ? <TableComponent data={jobHistory} /> : <></>}
+        {jobHistory.length > 0 ? <JobHistoryTable data={jobHistory} /> : <></>}
       </div>
     </div>
   );

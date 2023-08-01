@@ -5,7 +5,6 @@ import { Select, Input, Textarea, Button, Center, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { ulid } from "ulid";
 import { useNavigate } from "react-router-dom";
-import { Searching } from "../searching";
 import { serverUrl } from "../App.js";
 import {
   ProgramForm,
@@ -42,6 +41,10 @@ function Blastn() {
       setIsQueryFilePicked(true);
     }
   };
+
+  const [jobTitle, setJobTitle] = useState("");
+  const inputJobTitle = useRef(jobTitle);
+
   const [alignTwoOrMoreSequences, setAlignTwoOrMoreSequences] = useState(false);
   const handleAlignTwoOrMoreSequences = (e) => {
     setAlignTwoOrMoreSequences(e.target.checked);
@@ -146,6 +149,8 @@ function Blastn() {
       queryFrom: queryFrom,
       queryTo: queryTo,
 
+      jobTitle: inputJobTitle.current.value,
+
       alignTwoOrMoreSequences: alignTwoOrMoreSequences,
 
       subjectFile: subjectFile,
@@ -249,6 +254,7 @@ function Blastn() {
           handleQueryFromChange={handleQueryFromChange}
           handleQueryToChange={handleQueryToChange}
           handleQueryFile={handleQueryFile}
+          jobTitleRef={inputJobTitle}
           alignTwoOrMoreSequences={alignTwoOrMoreSequences}
           handleAlignTwoOrMoreSequences={handleAlignTwoOrMoreSequences}
           subjectRef={inputSubjectSequence}
