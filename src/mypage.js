@@ -136,7 +136,6 @@ const Mypage = () => {
 
   return (
     <>
-      Hello, {user}!
       <ViewJobHistory />
     </>
   );

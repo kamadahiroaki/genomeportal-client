@@ -22,6 +22,7 @@ import {
   NumberInputField,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { match } from "assert";
 
 const Title = ({ title }) => {
   return (
@@ -369,6 +370,7 @@ const ProgramSelection = ({
         matchScore={matchScore}
         handleMatchScoreChange={handleMatchScoreChange}
         gapCosts={gapCosts}
+        setGapCosts={setGapCosts}
         handleGapCostsChange={handleGapCostsChange}
       />
       <FiltersAndMasking
@@ -382,7 +384,6 @@ const ProgramSelection = ({
 };
 
 const OptimizeFor = ({ optimize, handleOptimizeChange }) => {
-  //  useEffect(() => setMaxTargetSequences(200), [optimize]);
   return (
     <Flex mb="2">
       <Text w="150px">Optimize for </Text>
@@ -593,6 +594,7 @@ const ScoringParameters = ({
   matchScore,
   handleMatchScoreChange,
   gapCosts,
+  setGapCosts,
   handleGapCostsChange,
 }) => {
   return (
@@ -611,7 +613,9 @@ const ScoringParameters = ({
       />
       <GapCosts
         optimize={optimize}
+        matchScore={matchScore}
         gapCosts={gapCosts}
+        setGapCosts={setGapCosts}
         handleGapCostsChange={handleGapCostsChange}
       />
     </Box>
@@ -651,18 +655,38 @@ const MatchScores = ({ matchScore, handleMatchScoreChange }) => {
   );
 };
 
-const GapCosts = ({ optimize, gapCosts, handleGapCostsChange }) => {
+const GapCosts = ({
+  optimize,
+  matchScore,
+  gapCosts,
+  setGapCosts,
+  handleGapCostsChange,
+}) => {
   const temp1 = [
-    { id: 1, value: "Linear", label: "Linear" },
-    { id: 2, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 3, value: "[2, 2]", label: "Existence:2 Extension:2" },
-    { id: 4, value: "[1, 2]", label: "Existence:1 Extension:2" },
-    { id: 5, value: "[0, 2]", label: "Existence:0 Extension:2" },
-    { id: 6, value: "[3, 1]", label: "Existence:3 Extension:1" },
-    { id: 7, value: "[2, 1]", label: "Existence:2 Extension:1" },
-    { id: 8, value: "[1, 1]", label: "Existence:1 Extension:1" },
+    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[2, 2]", label: "Existence:2 Extension:2" },
+    { id: 3, value: "[1, 2]", label: "Existence:1 Extension:2" },
+    { id: 4, value: "[0, 2]", label: "Existence:0 Extension:2" },
+    { id: 5, value: "[3, 1]", label: "Existence:3 Extension:1" },
+    { id: 6, value: "[2, 1]", label: "Existence:2 Extension:1" },
+    { id: 7, value: "[1, 1]", label: "Existence:1 Extension:1" },
   ];
   const temp2 = [
+    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[2, 2]", label: "Existence:2 Extension:2" },
+    { id: 3, value: "[1, 2]", label: "Existence:1 Extension:2" },
+    { id: 4, value: "[0, 2]", label: "Existence:0 Extension:2" },
+    { id: 5, value: "[2, 1]", label: "Existence:2 Extension:1" },
+    { id: 6, value: "[1, 1]", label: "Existence:1 Extension:1" },
+  ];
+  const temp3 = [
+    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[1, 2]", label: "Existence:1 Extension:2" },
+    { id: 3, value: "[0, 2]", label: "Existence:0 Extension:2" },
+    { id: 4, value: "[2, 1]", label: "Existence:2 Extension:1" },
+    { id: 5, value: "[1, 1]", label: "Existence:1 Extension:1" },
+  ];
+  const temp4 = [
     { id: 1, value: "[4, 4]", label: "Existence:4 Extension:4" },
     { id: 2, value: "[2, 4]", label: "Existence:2 Extension:4" },
     { id: 3, value: "[0, 4]", label: "Existence:0 Extension:4" },
@@ -672,7 +696,44 @@ const GapCosts = ({ optimize, gapCosts, handleGapCostsChange }) => {
     { id: 7, value: "[4, 2]", label: "Existence:4 Extension:2" },
     { id: 8, value: "[2, 2]", label: "Existence:2 Extension:2" },
   ];
-  const gapCostsOptions = [temp1, temp2, temp2];
+  const temp5 = [
+    { id: 1, value: "[12,8]", label: "Existence:12 Extension:8" },
+    { id: 2, value: "[6,5]", label: "Existence:6 Extension:5" },
+    { id: 3, value: "[5,5]", label: "Existence:5 Extension:5" },
+    { id: 4, value: "[4,5]", label: "Existence:4 Extension:5" },
+    { id: 5, value: "[3,5]", label: "Existence:3 Extension:5" },
+  ];
+  const temp6 = [
+    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[3, 2]", label: "Existence:3 Extension:2" },
+    { id: 3, value: "[2, 2]", label: "Existence:2 Extension:2" },
+    { id: 4, value: "[1, 2]", label: "Existence:1 Extension:2" },
+    { id: 5, value: "[0, 2]", label: "Existence:0 Extension:2" },
+    { id: 6, value: "[4, 1]", label: "Existence:4 Extension:1" },
+    { id: 7, value: "[3, 1]", label: "Existence:3 Extension:1" },
+    { id: 8, value: "[2, 1]", label: "Existence:2 Extension:1" },
+  ];
+
+  const matchScore2gapCosts = {
+    "[1, -2]": temp1,
+    "[1, -3]": temp2,
+    "[1, -4]": temp3,
+    "[2, -3]": temp4,
+    "[4, -5]": temp5,
+    "[1, -1]": temp6,
+  };
+  let gapCostsOptions = matchScore2gapCosts[matchScore];
+  if (optimize === 0 && matchScore != "[1, -1]") {
+    gapCostsOptions.unshift({ id: 0, value: "Linear", label: "Linear" });
+  }
+
+  if (optimize === 0 && matchScore != "[1, -1]") {
+    setGapCosts("Linear");
+  } else if (matchScore === "[4, -5]") {
+    setGapCosts("[12,8]");
+  } else {
+    setGapCosts("[5, 2]");
+  }
 
   return (
     <Flex mb="2">
@@ -687,7 +748,7 @@ const GapCosts = ({ optimize, gapCosts, handleGapCostsChange }) => {
         borderColor="gray.400"
         w="250px"
       >
-        {gapCostsOptions[optimize].map((option) => (
+        {gapCostsOptions.map((option) => (
           <option value={option.value} key={option.id}>
             {option.label}
           </option>

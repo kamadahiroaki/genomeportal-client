@@ -72,7 +72,7 @@ function Blastn() {
     }
   };
 
-  const [database, setDatabase] = useState("");
+  const [database, setDatabase] = useState("human");
   const handleDatabase = (e) => {
     setDatabase(e.target.value);
   };
@@ -132,10 +132,6 @@ function Blastn() {
     setTemplateType(e.target.value);
   };
 
-  console.log("et:", expectedThreshold);
-  console.log("query:", querySequence);
-  console.log("queryv:", inputQuerySequence.current.value);
-
   const navigate = useNavigate();
 
   const handleSubmit = () => {
@@ -183,9 +179,8 @@ function Blastn() {
       soft_masking: maskForLookupTableOnly,
       //      lcase_masking: maskLowerCaseLetters,
     };
-    if (gapCosts == "Linear") {
-      params.gapopen = params.gapextend = params.penalty;
-    } else {
+    //https://www.ncbi.nlm.nih.gov/books/NBK279684/#_appendices_BLASTN_rewardpenalty_values_
+    if (gapCosts != "Linear") {
       params.gapopen = JSON.parse(gapCosts)[0];
       params.gapextend = JSON.parse(gapCosts)[1];
     }
