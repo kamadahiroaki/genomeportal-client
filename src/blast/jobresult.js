@@ -139,44 +139,51 @@ const DataTable = (resdata) => {
           <Divider />
           <TableItem label="Title" value={injson.jobTitle} />
           {injson.alignTwoOrMoreSequences ? null : (
-            <TableItem label="Database" value={injson.database} />
+            <TableItem label="Database" value={injson.db} />
           )}
           <TableItem label="Task" value={injson.task} />
 
           <TableItem
             label="Max target sequences"
-            value={injson.maxTargetSequences}
+            value={injson.max_target_seqs}
           />
-          <TableItem
-            label="Expected threshold"
-            value={injson.expectedThreshold}
-          />
-          <TableItem label="Word size" value={injson.wordSize} />
+          <TableItem label="Expected threshold" value={injson.evalue} />
+          <TableItem label="Word size" value={injson.word_size} />
           <TableItem
             label="Max matches in a query range"
-            value={injson.maxMatches}
+            value={injson.culling_limit}
           />
-          <TableItem label="Match/Mismatch scores" value={injson.matchScore} />
-          <TableItem label="Gap costs" value={injson.gapCosts} />
+          <TableItem
+            label="Match/Mismatch scores"
+            value={"[" + injson.reward + "," + injson.penalty + "]"}
+          />
+          <TableItem
+            label="Gap costs"
+            value={
+              injson.gapopen
+                ? "[" + injson.gapopen + "," + injson.gapextend + "]"
+                : "Linear"
+            }
+          />
           <TableItem
             label="Filter Low complexity regions"
-            value={injson.filterLowComplexityRegions ? "Yes" : "No"}
+            value={injson.dust === "yes" ? "Yes" : "No"}
           />
           <TableItem
             label="Mask for lookup table only"
-            value={injson.maskForLookupTableOnly ? "Yes" : "No"}
+            value={injson.soft_masking ? "Yes" : "No"}
           />
           <TableItem
             label="Mask lower case Letters"
-            value={injson.maskLowerCaseLetters ? "Yes" : "No"}
+            value={injson.lcase_masking ? "Yes" : "No"}
           />
           {injson.task == "dc-megablast" ? (
             <div>
               <TableItem
                 label="Template length"
-                value={injson.templateLength}
+                value={injson.template_length}
               />
-              <TableItem label="Template type" value={injson.templateType} />
+              <TableItem label="Template type" value={injson.template_type} />
             </div>
           ) : null}
 

@@ -22,7 +22,18 @@ import {
   NumberInputField,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { match } from "assert";
+import {
+  ProgramForm,
+  QuerySequenceForm,
+  QuerySequenceFormN,
+  AlgorithmParametersForm,
+  ProgramSelection,
+  GeneralParameters,
+  ScoringParameters,
+  EnterQuerySequence,
+  ChooseSearchSet,
+  FiltersAndMasking,
+} from "./blastSearchForms";
 
 const Title = ({ title }) => {
   return (
@@ -44,252 +55,7 @@ const Title = ({ title }) => {
   );
 };
 
-const ProgramForm = ({ program }) => {
-  const navigate = useNavigate();
-  const op = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
-  return (
-    <Box>
-      <Stack direction="row" spacing={1} align="center">
-        {op.map((p) => (
-          <Button
-            colorScheme={p == program ? "blue" : "gray"}
-            onClick={() => {
-              navigate("blast/" + { p });
-            }}
-            key={p}
-          >
-            {p}
-          </Button>
-        ))}
-      </Stack>
-    </Box>
-  );
-};
-
-const EnterQuerySequence = ({
-  queryRef,
-  handleQueryFile,
-  jobTitleRef,
-  queryFrom,
-  queryTo,
-  handleQueryFromChange,
-  handleQueryToChange,
-  alignTwoOrMoreSequences,
-  handleAlignTwoOrMoreSequences,
-  subjectRef,
-  handleSubjectFile,
-  subjectFrom,
-  subjectTo,
-  handleSubjectFromChange,
-  handleSubjectToChange,
-  handleDatabase,
-}) => {
-  return (
-    <>
-      <Box
-        padding="2"
-        mb="8"
-        bgColor="gray.100"
-        borderWidth="1px"
-        borderColor="gray.400"
-        borderRadius="lg"
-      >
-        <Title title="Enter Query Sequence" />
-        <Query
-          queryRef={queryRef}
-          queryFrom={queryFrom}
-          queryTo={queryTo}
-          handleSubrangeFromChange={handleQueryFromChange}
-          handleSubrangeToChange={handleQueryToChange}
-          queryOrSubject="Query"
-        />
-        <File handleFile={handleQueryFile} />
-        <JobTitle jobTitleRef={jobTitleRef} />
-        <Align23
-          handleAlignTwoOrMoreSequences={handleAlignTwoOrMoreSequences}
-        />
-      </Box>
-      {alignTwoOrMoreSequences ? (
-        <EnterSubjectSequence
-          queryRef={subjectRef}
-          handleFile={handleSubjectFile}
-          queryFrom={subjectFrom}
-          queryTo={subjectTo}
-          handleSubrangeFromChange={handleSubjectFromChange}
-          handleSubrangeToChange={handleSubjectToChange}
-        />
-      ) : (
-        <ChooseSearchSet handleDatabase={handleDatabase} />
-      )}
-    </>
-  );
-};
-
-const Query = ({
-  queryRef,
-  subrangeFrom,
-  handleSubrangeFromChange,
-  subrangeTo,
-  handleSubrangeToChange,
-  queryOrSubject,
-}) => {
-  return (
-    <Flex mb="2">
-      <Box>
-        <Text>Enter FASTA sequence(s)</Text>
-        <Textarea
-          ref={queryRef}
-          bgColor="white"
-          borderColor="gray.400"
-          w="500px"
-        />
-      </Box>
-      <Box ml="4">
-        <Text textAlign="center">{queryOrSubject} subrange</Text>
-        <Box mb="2">
-          <Flex>
-            <Text w="50px" textAlign="right" pr="1">
-              From
-            </Text>
-            <NumberInput
-              min={1}
-              onChange={handleSubrangeFromChange}
-              bgColor="white"
-              borderColor="gray.400"
-              w="100px"
-            >
-              <NumberInputField></NumberInputField>
-            </NumberInput>
-          </Flex>
-        </Box>
-        <Box>
-          <Flex>
-            <Text w="50px" textAlign="right" pr="1">
-              To
-            </Text>
-            <NumberInput
-              min={1}
-              onChange={handleSubrangeToChange}
-              bgColor="white"
-              borderColor="gray.400"
-              w="100px"
-            >
-              <NumberInputField></NumberInputField>
-            </NumberInput>
-          </Flex>
-        </Box>
-      </Box>
-    </Flex>
-  );
-};
-
-const File = ({ handleFile }) => {
-  return (
-    <Flex mb="2">
-      <Text w="150px">Or, upload file </Text>
-      <Divider orientation="vertical" h="30px" borderColor="gray.600" mr="4" />
-      <input type="file" name="file" onChange={handleFile} />
-    </Flex>
-  );
-};
-
-const JobTitle = ({ jobTitleRef }) => {
-  return (
-    <Flex>
-      <Text w="150px">Job Title</Text>
-      <Divider orientation="vertical" h="40px" borderColor="gray.600" mr="4" />
-      <Input
-        ref={jobTitleRef}
-        bgColor="white"
-        mb="2"
-        borderColor="gray.400"
-        w="600px"
-      />
-    </Flex>
-  );
-};
-
-const Align23 = ({ handleAlignTwoOrMoreSequences }) => {
-  return (
-    <Checkbox
-      onChange={handleAlignTwoOrMoreSequences}
-      borderColor="blackAlpha.600"
-      sx={{
-        ".chakra-checkbox__control": {
-          bg: "white",
-        },
-      }}
-    >
-      Align two or more sequences
-    </Checkbox>
-  );
-};
-
-const ChooseSearchSet = ({ handleDatabase }) => {
-  const database = [{ id: 1, value: "human", label: "human" }];
-  return (
-    <Box
-      padding="2"
-      mb="8"
-      bgColor="gray.100"
-      borderWidth="1px"
-      borderColor="gray.400"
-      borderRadius="lg"
-    >
-      <Title title="Choose Search Set" />
-      <Flex>
-        <Text w="150px" lineHeight="1">
-          Database
-        </Text>
-        <Divider
-          orientation="vertical"
-          borderColor="gray.600"
-          h="40px"
-          mr="4"
-        />
-        <Select
-          //              value={gapCosts}
-          onChange={handleDatabase}
-          bgColor="white"
-          borderColor="gray.400"
-          w="250px"
-        >
-          {database.map((option) => (
-            <option value={option.value} key={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </Select>
-      </Flex>
-    </Box>
-  );
-};
-
-const EnterSubjectSequence = ({ queryRef, handleFile, fromRef, toRef }) => {
-  return (
-    <>
-      <Box
-        padding="2"
-        mb="8"
-        bgColor="gray.100"
-        borderWidth="1px"
-        borderColor="gray.400"
-        borderRadius="lg"
-      >
-        <Title title="Enter Subject Sequence" />
-        <Query
-          queryRef={queryRef}
-          fromRef={fromRef}
-          toRef={toRef}
-          queryOrSubject="Subject"
-        />
-        <File handleFile={handleFile} />
-      </Box>
-    </>
-  );
-};
-
-const ProgramSelection = ({
+const ProgramSelectionP = ({
   handleSubmit,
   setTask,
   maxTargetSequences,
@@ -383,7 +149,7 @@ const ProgramSelection = ({
   );
 };
 
-const OptimizeFor = ({ optimize, handleOptimizeChange }) => {
+const OptimizeForP = ({ optimize, handleOptimizeChange }) => {
   return (
     <Flex mb="2">
       <Text w="150px">Optimize for </Text>
@@ -420,7 +186,7 @@ const OptimizeFor = ({ optimize, handleOptimizeChange }) => {
   );
 };
 
-const GeneralParameters = ({
+const GeneralParametersP = ({
   optimize,
   maxTargetSequences,
   handleMaxTargetSequencesChange,
@@ -441,7 +207,7 @@ const GeneralParameters = ({
       borderRadius="lg"
     >
       <Title title="General Parameters" />
-      <MaxTargetSequences
+      <MaxTargetSequencesP
         maxTargetSequences={maxTargetSequences}
         handleMaxTargetSequencesChange={handleMaxTargetSequencesChange}
       />
@@ -449,7 +215,7 @@ const GeneralParameters = ({
         expectedThreshold={expectedThreshold}
         handleExpectedThresholdChange={handleExpectedThresholdChange}
       />
-      <WordSize
+      <WordSizeP
         optimize={optimize}
         wordSize={wordSize}
         handleWordSizeChange={handleWordSizeChange}
@@ -462,7 +228,7 @@ const GeneralParameters = ({
   );
 };
 
-const MaxTargetSequences = ({
+const MaxTargetSequencesP = ({
   maxTargetSequences,
   handleMaxTargetSequencesChange,
 }) => {
@@ -495,30 +261,6 @@ const MaxTargetSequences = ({
           </option>
         ))}
       </Select>
-    </Flex>
-  );
-};
-
-const ExpectedThreshold = ({
-  expectedThreshold,
-  handleExpectedThresholdChange,
-}) => {
-  return (
-    <Flex mb="2">
-      <Text w="150px" lineHeight="1">
-        Expected threshold
-      </Text>
-      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
-      <NumberInput
-        defaultValue={expectedThreshold}
-        min={0}
-        onChange={handleExpectedThresholdChange}
-        bgColor="white"
-        borderColor="gray.400"
-        w="100px"
-      >
-        <NumberInputField></NumberInputField>
-      </NumberInput>
     </Flex>
   );
 };
@@ -569,27 +311,7 @@ const WordSize = ({ optimize, wordSize, handleWordSizeChange }) => {
   );
 };
 
-const MaxMatches = ({ maxMatches, handleMaxMatchesChange }) => {
-  return (
-    <Flex mb="2">
-      <Text w="150px" lineHeight="1">
-        Max matches in a query range
-      </Text>
-      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
-      <NumberInput
-        defaultValue={maxMatches}
-        onChange={handleMaxMatchesChange}
-        bgColor="white"
-        borderColor="gray.400"
-        w="100px"
-      >
-        <NumberInputField></NumberInputField>
-      </NumberInput>
-    </Flex>
-  );
-};
-
-const ScoringParameters = ({
+const ScoringParametersP = ({
   optimize,
   matchScore,
   handleMatchScoreChange,
@@ -607,11 +329,11 @@ const ScoringParameters = ({
       borderRadius="lg"
     >
       <Title title="Scoring Parameters" />
-      <MatchScores
+      <MatchScoresP
         matchScore={matchScore}
         handleMatchScoreChange={handleMatchScoreChange}
       />
-      <GapCosts
+      <GapCostsP
         optimize={optimize}
         matchScore={matchScore}
         gapCosts={gapCosts}
@@ -622,7 +344,7 @@ const ScoringParameters = ({
   );
 };
 
-const MatchScores = ({ matchScore, handleMatchScoreChange }) => {
+const MatchScoresP = ({ matchScore, handleMatchScoreChange }) => {
   const matchScoresOptions = [
     { id: 1, value: "[1, -2]", label: "1,-2" },
     { id: 2, value: "[1, -3]", label: "1,-3" },
@@ -655,7 +377,7 @@ const MatchScores = ({ matchScore, handleMatchScoreChange }) => {
   );
 };
 
-const GapCosts = ({
+const GapCostsP = ({
   optimize,
   matchScore,
   gapCosts,
@@ -761,7 +483,7 @@ const GapCosts = ({
   );
 };
 
-const FiltersAndMasking = ({
+const FiltersAndMaskingOnOffOff = ({
   handleFilterLowComplexityRegions,
   handleMaskForLookupTableOnly,
   handleMaskLowerCaseLetters,
@@ -779,7 +501,32 @@ const FiltersAndMasking = ({
       <Filter
         handleFilterLowComplexityRegions={handleFilterLowComplexityRegions}
       />
-      <Mask
+      <MaskOff
+        handleMaskForLookupTableOnly={handleMaskForLookupTableOnly}
+        handleMaskLowerCaseLetters={handleMaskLowerCaseLetters}
+      />
+    </Box>
+  );
+};
+const FiltersAndMaskingOffOffOff = ({
+  handleFilterLowComplexityRegions,
+  handleMaskForLookupTableOnly,
+  handleMaskLowerCaseLetters,
+}) => {
+  return (
+    <Box
+      p="2"
+      mb="8"
+      bgColor="gray.100"
+      borderWidth="1px"
+      borderColor="gray.400"
+      borderRadius="lg"
+    >
+      <Title title="Filters and Masking" />
+      <FilterOff
+        handleFilterLowComplexityRegions={handleFilterLowComplexityRegions}
+      />
+      <MaskOff
         handleMaskForLookupTableOnly={handleMaskForLookupTableOnly}
         handleMaskLowerCaseLetters={handleMaskLowerCaseLetters}
       />
@@ -787,7 +534,7 @@ const FiltersAndMasking = ({
   );
 };
 
-const Filter = ({ handleFilterLowComplexityRegions }) => {
+const FilterOff = ({ handleFilterLowComplexityRegions }) => {
   return (
     <Flex mb="2">
       <Text w="150px" lineHeight="1">
@@ -796,7 +543,6 @@ const Filter = ({ handleFilterLowComplexityRegions }) => {
       <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
 
       <Checkbox
-        defaultChecked
         onChange={handleFilterLowComplexityRegions}
         borderColor="blackAlpha.600"
         sx={{
@@ -811,7 +557,10 @@ const Filter = ({ handleFilterLowComplexityRegions }) => {
   );
 };
 
-const Mask = ({ handleMaskForLookupTableOnly, handleMaskLowerCaseLetters }) => {
+const MaskOff = ({
+  handleMaskForLookupTableOnly,
+  handleMaskLowerCaseLetters,
+}) => {
   return (
     <Flex mb="2">
       <Text w="150px" lineHeight="1">
@@ -821,7 +570,6 @@ const Mask = ({ handleMaskForLookupTableOnly, handleMaskLowerCaseLetters }) => {
       <Box>
         <Box>
           <Checkbox
-            defaultChecked
             onChange={handleMaskForLookupTableOnly}
             borderColor="blackAlpha.600"
             sx={{
@@ -851,84 +599,6 @@ const Mask = ({ handleMaskForLookupTableOnly, handleMaskLowerCaseLetters }) => {
   );
 };
 
-const DiscontiguousWordOptions = ({}) => {
-  return (
-    <Box
-      p="2"
-      mb="8"
-      bgColor="gray.100"
-      borderWidth="1px"
-      borderColor="gray.400"
-      borderRadius="lg"
-    >
-      <Title title="Discontiguous Word Options" />
-      <TemplateLength />
-      <TemplateType />
-    </Box>
-  );
-};
-
-const TemplateLength = ({}) => {
-  const templatelengthoptions = [
-    //    { id: 1, value: "None", label: "None" },
-    { id: 1, value: "16", label: "16" },
-    { id: 2, value: "18", label: "18" },
-    { id: 3, value: "21", label: "21" },
-  ];
-
-  return (
-    <Flex mb="2">
-      <Text w="150px" lineHeight="1">
-        Template length
-      </Text>
-      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
-      <Select
-        defaultValue={"18"}
-        //        onChange={handleGapCostsChange}
-        bgColor="white"
-        borderColor="gray.400"
-        w="250px"
-      >
-        {templatelengthoptions.map((option) => (
-          <option value={option.value} key={option.id}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
-    </Flex>
-  );
-};
-
-const TemplateType = ({}) => {
-  const templateTypeOptions = [
-    { id: 1, value: "coding", label: "Coding" },
-    { id: 2, value: "coding_and_optimal", label: "Coding and Optimal" },
-    { id: 3, value: "optimal", label: "Optimal" },
-  ];
-
-  return (
-    <Flex>
-      <Text w="150px" lineHeight="1">
-        Template type
-      </Text>
-      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
-      <Select
-        defaultValue={"16"}
-        //        onChange={handleGapCostsChange}
-        bgColor="white"
-        borderColor="gray.400"
-        w="250px"
-      >
-        {templateTypeOptions.map((option) => (
-          <option value={option.value} key={option.id}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
-    </Flex>
-  );
-};
-
 export {
   ProgramForm,
   EnterQuerySequence,
@@ -936,5 +606,6 @@ export {
   ProgramSelection,
   GeneralParameters,
   ScoringParameters,
-  FiltersAndMasking,
+  FiltersAndMaskingOnOffOff,
+  FiltersAndMaskingOffOffOff,
 };

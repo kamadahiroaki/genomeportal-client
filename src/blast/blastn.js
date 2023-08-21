@@ -127,7 +127,7 @@ function Blastn() {
   const handleTemplateLength = (e) => {
     setTemplateLength(e.target.value);
   };
-  const [templateType, setTemplateType] = useState("Coding");
+  const [templateType, setTemplateType] = useState("coding");
   const handleTemplateType = (e) => {
     setTemplateType(e.target.value);
   };
@@ -137,38 +137,26 @@ function Blastn() {
   const handleSubmit = () => {
     setQuerySequence(inputQuerySequence.current.value);
     //    setExpectedThreshold(inputExpectedThreshold.current.value);
+    if (!isQueryFilePicked && !inputQuerySequence.current.value) {
+      alert("Please enter a query sequence or upload a query file.");
+      return;
+    }
+    if (
+      alignTwoOrMoreSequences &&
+      !isSubjectFilePicked &&
+      !inputSubjectSequence.current.value
+    ) {
+      alert("Please enter a subject sequence or upload a subject file.");
+      return;
+    }
 
     const params = {
-      queryFile: queryFile,
-      isQueryFilePicked: isQueryFilePicked,
-      querySequence: inputQuerySequence.current.value,
-      queryFrom: queryFrom,
-      queryTo: queryTo,
-
       jobTitle: inputJobTitle.current.value,
-
       alignTwoOrMoreSequences: alignTwoOrMoreSequences,
 
-      subjectFile: subjectFile,
-      subjectFrom: subjectFrom,
-      subjectTo: subjectTo,
-
-      database: database,
-
       task: task,
-      maxTargetSequences: maxTargetSequences,
-      expectedThreshold: expectedThreshold,
-      wordSize: wordSize,
-      maxMatches: maxMatches,
 
-      matchScore: matchScore,
-      gapCosts: gapCosts,
-
-      filterLowComplexityRegions: filterLowComplexityRegions,
-      maskForLookupTableOnly: maskForLookupTableOnly,
-      maskLowerCaseLetters: maskLowerCaseLetters,
-
-      db: database,
+      //      db: database,
       evalue: expectedThreshold,
       word_size: wordSize,
       max_target_seqs: maxTargetSequences,
@@ -179,11 +167,15 @@ function Blastn() {
       soft_masking: maskForLookupTableOnly,
       //      lcase_masking: maskLowerCaseLetters,
     };
+    if (!alignTwoOrMoreSequences) {
+      params.db = database;
+    }
     //https://www.ncbi.nlm.nih.gov/books/NBK279684/#_appendices_BLASTN_rewardpenalty_values_
     if (gapCosts != "Linear") {
       params.gapopen = JSON.parse(gapCosts)[0];
       params.gapextend = JSON.parse(gapCosts)[1];
     }
+    console.log("gapCosts: " + gapCosts);
     if (queryFrom >= 1 && queryTo >= queryFrom) {
       params.query_loc = queryFrom + "-" + queryTo;
     }
@@ -191,16 +183,34 @@ function Blastn() {
       params.subject_loc = subjectFrom + "-" + subjectTo;
     }
     if (task == "dc-megablast") {
-      params.templateLength = templateLength;
-      params.templateType = templateType;
+      params.template_length = templateLength;
+      params.template_type = templateType;
     }
     if (maskLowerCaseLetters) {
       params.lcase_masking = "";
     }
 
     const formData = new FormData();
-    formData.append("files", queryFile);
-    formData.append("files", subjectFile);
+    if (isQueryFilePicked) {
+      formData.append("files", queryFile);
+    } else if (!isQueryFilePicked && inputQuerySequence.current.value) {
+      const blob = new Blob([inputQuerySequence.current.value], {
+        type: "text/plain",
+      });
+      formData.append("files", blob, "query.txt");
+    }
+    if (isSubjectFilePicked) {
+      formData.append("files", subjectFile);
+    } else if (
+      alignTwoOrMoreSequences &&
+      !isSubjectFilePicked &&
+      inputSubjectSequence.current.value
+    ) {
+      const blob = new Blob([inputSubjectSequence.current.value], {
+        type: "text/plain",
+      });
+      formData.append("files", blob, "subject.txt");
+    }
     formData.append("params", JSON.stringify(params));
 
     const postData = async (newData) => {
