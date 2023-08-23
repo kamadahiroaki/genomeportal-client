@@ -7,19 +7,13 @@ import { ulid } from "ulid";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App.js";
 import {
-  ProgramForm,
-  QuerySequenceForm,
-  QuerySequenceFormN,
-  AlgorithmParametersForm,
+  AlignmentToolForm,
   ProgramSelection,
-  GeneralParameters,
-  ScoringParameters,
   EnterQuerySequence,
-  ChooseSearchSet,
-  FiltersAndMasking,
 } from "./blastSearchForms";
 
 function Blastn() {
+  const alignmentTool = "blastn";
   const [querySequence, setQuerySequence] = useState("");
   const inputQuerySequence = useRef(querySequence);
   const [queryFrom, setQueryFrom] = useState(0);
@@ -77,9 +71,17 @@ function Blastn() {
     setDatabase(e.target.value);
   };
 
+  const defaultValues = {
+    megablast: { ws: 28, ms: "[1,-2]", gc: "Linear" },
+    "dc-megablast": { ws: 11, ms: "[2,-3]", gc: "[5,2]" },
+    blastn: { ws: 18, ms: "[2,-3]", gc: "[5,2]" },
+  };
   const [task, setTask] = useState("megablast");
   const handleTaskChange = (e) => {
-    setTask(e);
+    setTask(e.target.value);
+    setWordSize(defaultValues[e.target.value].ws);
+    setMatchScore(defaultValues[e.target.value].ms);
+    setGapCosts(defaultValues[e.target.value].gc);
   };
 
   const [maxTargetSequences, setMaxTargetSequences] = useState(100);
@@ -151,12 +153,10 @@ function Blastn() {
     }
 
     const params = {
+      alignmentTool: alignmentTool,
       jobTitle: inputJobTitle.current.value,
       alignTwoOrMoreSequences: alignTwoOrMoreSequences,
-
       task: task,
-
-      //      db: database,
       evalue: expectedThreshold,
       word_size: wordSize,
       max_target_seqs: maxTargetSequences,
@@ -240,7 +240,7 @@ function Blastn() {
   return (
     <>
       <Box mt="2" ml="2">
-        <ProgramForm program={"blastn"} />
+        <AlignmentToolForm alignmentTool={alignmentTool} />
       </Box>
       <Box
         margin="2"
@@ -271,6 +271,9 @@ function Blastn() {
           handleDatabase={handleDatabase}
         />
         <ProgramSelection
+          alignmentTool={alignmentTool}
+          task={task}
+          handleTaskChange={handleTaskChange}
           handleSubmit={handleSubmit}
           setTask={setTask}
           maxTargetSequences={maxTargetSequences}

@@ -291,7 +291,6 @@ const EnterSubjectSequence = ({ queryRef, handleFile, fromRef, toRef }) => {
 
 const ProgramSelection = ({
   alignmentTool,
-  task,
   handleSubmit,
   setTask,
   maxTargetSequences,
@@ -314,6 +313,21 @@ const ProgramSelection = ({
   handleMaskForLookupTableOnly,
   handleMaskLowerCaseLetters,
 }) => {
+  const tasks = ["megablast", "dc-megablast", "blastn"];
+  const defaultValues = [
+    { ws: 28, ms: "[1, -2]", gc: "Linear" },
+    { ws: 11, ms: "[2, -3]", gc: "[5, 2]" },
+    { ws: 11, ms: "[2, -3]", gc: "[5, 2]" },
+  ];
+  const [optimize, setOptimize] = useState(0);
+  const handleOptimizeChange = (e) => {
+    setTask(tasks[e.target.value]);
+    setOptimize(e.target.value);
+    setWordSize(defaultValues[e.target.value].ws);
+    setGapCosts(defaultValues[e.target.value].gc);
+    setMatchScore(defaultValues[e.target.value].ms);
+  };
+
   return (
     <>
       <Box
@@ -324,25 +338,13 @@ const ProgramSelection = ({
         borderColor="gray.400"
         borderRadius="lg"
       >
-        {alignmentTool == "blastn" ? (
+        {alignmentTool == "blastn" || alignmentTool == "blastp" ? (
           <>
             <Title title="Program Selection" />
             <OptimizeFor
               alignmentTool={alignmentTool}
-              task={task}
-              handleTaskChange={handleTaskChange}
-            />
-          </>
-        ) : (
-          <></>
-        )}
-        {alignmentTool == "blastp" ? (
-          <>
-            <Title title="Program Selection" />
-            <Algorithm
-              alignmentTool={alignmentTool}
-              task={task}
-              handleTaskChange={handleTaskChange}
+              optimize={optimize}
+              handleOptimizeChange={handleOptimizeChange}
             />
           </>
         ) : (
@@ -355,7 +357,7 @@ const ProgramSelection = ({
 
       <GeneralParameters
         alignmentTool={alignmentTool}
-        task={task}
+        optimize={optimize}
         maxTargetSequences={maxTargetSequences}
         setMaxTargetSequences={setMaxTargetSequences}
         handleMaxTargetSequencesChange={handleMaxTargetSequencesChange}
@@ -368,7 +370,7 @@ const ProgramSelection = ({
       />
       <ScoringParameters
         alignmentTool={alignmentTool}
-        task={task}
+        optimize={optimize}
         matchScore={matchScore}
         handleMatchScoreChange={handleMatchScoreChange}
         gapCosts={gapCosts}
@@ -390,7 +392,7 @@ const ProgramSelection = ({
   );
 };
 
-const OptimizeFor = ({ task, handleTaskChange }) => {
+const OptimizeFor = ({ optimize, handleOptimizeChange }) => {
   return (
     <Flex mb="2">
       <Text w="150px">Optimize for </Text>
@@ -398,26 +400,26 @@ const OptimizeFor = ({ task, handleTaskChange }) => {
       <RadioGroup defaultValue="0">
         <Stack>
           <Radio
-            value="megablast"
+            value="0"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             Highly similar sequences (megablast)
           </Radio>
           <Radio
-            value="dc-megablast"
+            value="1"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             More dissimilar sequences (discontiguous megablast)
           </Radio>
           <Radio
-            value="blastn"
+            value="2"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             Somewhat similar sequences (blastn)
           </Radio>
@@ -427,7 +429,7 @@ const OptimizeFor = ({ task, handleTaskChange }) => {
   );
 };
 
-const Algorithm = ({ task, handleTaskChange }) => {
+const Algorithm = ({ optimize, handleOptimizeChange }) => {
   return (
     <Flex mb="2">
       <Text w="150px">Algorithm </Text>
@@ -438,45 +440,7 @@ const Algorithm = ({ task, handleTaskChange }) => {
             value="0"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
-          >
-            blastp (for standard protein-protein comparisons)
-          </Radio>
-          <Radio
-            value="1"
-            bg="white"
-            borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
-          >
-            blastp-short (optimized for query sequences shorter than 30
-            residues)
-          </Radio>
-          <Radio
-            value="2"
-            bg="white"
-            borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
-          >
-            blastp-fast (a faster version that uses a larger word size)
-          </Radio>
-        </Stack>
-      </RadioGroup>
-    </Flex>
-  );
-};
-
-const AlgorithmWeb = ({ task, handleTaskChange }) => {
-  return (
-    <Flex mb="2">
-      <Text w="150px">Algorithm </Text>
-      <Divider orientation="vertical" h="90px" borderColor="gray.600" mr="4" />
-      <RadioGroup defaultValue="1">
-        <Stack>
-          <Radio
-            value="0"
-            bg="white"
-            borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             Quick BLASTP (Accelerated protein-protein BLAST)
           </Radio>
@@ -484,7 +448,7 @@ const AlgorithmWeb = ({ task, handleTaskChange }) => {
             value="1"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             blastp (protein-protein BLAST)
           </Radio>
@@ -492,7 +456,7 @@ const AlgorithmWeb = ({ task, handleTaskChange }) => {
             value="2"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             PSI-BLAST (Position-Specific Iterated BLAST)
           </Radio>
@@ -500,7 +464,7 @@ const AlgorithmWeb = ({ task, handleTaskChange }) => {
             value="3"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             PHI-BLAST (Pattern Hit Initiated BLAST)
           </Radio>
@@ -508,7 +472,7 @@ const AlgorithmWeb = ({ task, handleTaskChange }) => {
             value="4"
             bg="white"
             borderColor="blackAlpha.600"
-            onChange={handleTaskChange}
+            onChange={handleOptimizeChange}
           >
             DELTA-BLAST (Domain Enhanced Lookup Time Accelerated BLAST)
           </Radio>
@@ -519,8 +483,7 @@ const AlgorithmWeb = ({ task, handleTaskChange }) => {
 };
 
 const GeneralParameters = ({
-  alignmentTool,
-  task,
+  optimize,
   maxTargetSequences,
   handleMaxTargetSequencesChange,
   expectedThreshold,
@@ -549,8 +512,7 @@ const GeneralParameters = ({
         handleExpectedThresholdChange={handleExpectedThresholdChange}
       />
       <WordSize
-        alignmentTool={alignmentTool}
-        task={task}
+        optimize={optimize}
         wordSize={wordSize}
         handleWordSizeChange={handleWordSizeChange}
       />
@@ -623,73 +585,29 @@ const ExpectedThreshold = ({
   );
 };
 
-const WordSize = ({ alignmentTool, task, wordSize, handleWordSizeChange }) => {
-  const wordSizeOptions = {
-    blastn: {
-      megablast: [
-        { id: 1, value: 16, label: 16 },
-        { id: 2, value: 20, label: 20 },
-        { id: 3, value: 24, label: 24 },
-        { id: 4, value: 28, label: 28 },
-        { id: 5, value: 32, label: 32 },
-        { id: 6, value: 48, label: 48 },
-        { id: 7, value: 64, label: 64 },
-        { id: 8, value: 128, label: 128 },
-        { id: 9, value: 256, label: 256 },
-      ],
-      "dc-megablast": [
-        { id: 1, value: 11, label: 11 },
-        { id: 2, value: 12, label: 12 },
-      ],
-      blastn: [
-        { id: 1, value: 7, label: 7 },
-        { id: 2, value: 11, label: 11 },
-        { id: 3, value: 15, label: 15 },
-      ],
-    },
-    blastp: {
-      blastp: [
-        { id: 1, value: 2, label: 2 },
-        { id: 2, value: 3, label: 3 },
-        { id: 3, value: 5, label: 5 },
-        { id: 4, value: 6, label: 6 },
-      ],
-      "blastp-short": [
-        { id: 1, value: 2, label: 2 },
-        { id: 2, value: 3, label: 3 },
-        { id: 3, value: 5, label: 5 },
-        { id: 4, value: 6, label: 6 },
-      ],
-      "blastp-fast": [
-        { id: 1, value: 5, label: 5 },
-        { id: 2, value: 6, label: 6 },
-        { id: 3, value: 7, label: 7 },
-        { id: 4, value: 8, label: 8 },
-      ],
-    },
-    blastx: {
-      blastx: [
-        { id: 1, value: 2, label: 2 },
-        { id: 2, value: 3, label: 3 },
-        { id: 3, value: 5, label: 5 },
-        { id: 4, value: 6, label: 6 },
-      ],
-    },
-    tblastn: {
-      tblastn: [
-        { id: 1, value: 2, label: 2 },
-        { id: 2, value: 3, label: 3 },
-        { id: 3, value: 5, label: 5 },
-        { id: 4, value: 6, label: 6 },
-      ],
-    },
-    tblastx: {
-      tblastx: [
-        { id: 1, value: 2, label: 2 },
-        { id: 2, value: 3, label: 3 },
-      ],
-    },
-  };
+const WordSize = ({ optimize, wordSize, handleWordSizeChange }) => {
+  const wordSizeOptions = [
+    [
+      { id: 1, value: 16, label: 16 },
+      { id: 2, value: 20, label: 20 },
+      { id: 3, value: 24, label: 24 },
+      { id: 4, value: 28, label: 28 },
+      { id: 5, value: 32, label: 32 },
+      { id: 6, value: 48, label: 48 },
+      { id: 7, value: 64, label: 64 },
+      { id: 8, value: 128, label: 128 },
+      { id: 9, value: 256, label: 256 },
+    ],
+    [
+      { id: 1, value: 11, label: 11 },
+      { id: 2, value: 12, label: 12 },
+    ],
+    [
+      { id: 1, value: 7, label: 7 },
+      { id: 2, value: 11, label: 11 },
+      { id: 3, value: 15, label: 15 },
+    ],
+  ];
 
   return (
     <Flex mb="2">
@@ -703,7 +621,7 @@ const WordSize = ({ alignmentTool, task, wordSize, handleWordSizeChange }) => {
         borderColor="gray.400"
         w="100px"
       >
-        {wordSizeOptions[alignmentTool][task].map((option) => (
+        {wordSizeOptions[optimize].map((option) => (
           <option value={option.value} key={option.id}>
             {option.label}
           </option>
@@ -734,8 +652,7 @@ const MaxMatches = ({ maxMatches, handleMaxMatchesChange }) => {
 };
 
 const ScoringParameters = ({
-  alignmentTool,
-  task,
+  optimize,
   matchScore,
   handleMatchScoreChange,
   gapCosts,
@@ -757,8 +674,7 @@ const ScoringParameters = ({
         handleMatchScoreChange={handleMatchScoreChange}
       />
       <GapCosts
-        alignmentTool={alignmentTool}
-        task={task}
+        optimize={optimize}
         matchScore={matchScore}
         gapCosts={gapCosts}
         setGapCosts={setGapCosts}
@@ -908,7 +824,6 @@ const GapCosts = ({
 };
 
 const FiltersAndMasking = ({
-  alignmentTool,
   handleFilterLowComplexityRegions,
   handleMaskForLookupTableOnly,
   handleMaskLowerCaseLetters,
@@ -924,11 +839,9 @@ const FiltersAndMasking = ({
     >
       <Title title="Filters and Masking" />
       <Filter
-        alignmentTool={alignmentTool}
         handleFilterLowComplexityRegions={handleFilterLowComplexityRegions}
       />
       <Mask
-        alignmentTool={alignmentTool}
         handleMaskForLookupTableOnly={handleMaskForLookupTableOnly}
         handleMaskLowerCaseLetters={handleMaskLowerCaseLetters}
       />
@@ -936,7 +849,7 @@ const FiltersAndMasking = ({
   );
 };
 
-const Filter = ({ alignmentTool, handleFilterLowComplexityRegions }) => {
+const Filter = ({ handleFilterLowComplexityRegions }) => {
   return (
     <Flex mb="2">
       <Text w="150px" lineHeight="1">
@@ -944,41 +857,23 @@ const Filter = ({ alignmentTool, handleFilterLowComplexityRegions }) => {
       </Text>
       <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
 
-      {alignmentTool == "blastp" ? (
-        <Checkbox
-          onChange={handleFilterLowComplexityRegions}
-          borderColor="blackAlpha.600"
-          sx={{
-            ".chakra-checkbox__control": {
-              bg: "white",
-            },
-          }}
-        >
-          Low complexity regions
-        </Checkbox>
-      ) : (
-        <Checkbox
-          defaultChecked
-          onChange={handleFilterLowComplexityRegions}
-          borderColor="blackAlpha.600"
-          sx={{
-            ".chakra-checkbox__control": {
-              bg: "white",
-            },
-          }}
-        >
-          Low complexity regions
-        </Checkbox>
-      )}
+      <Checkbox
+        defaultChecked
+        onChange={handleFilterLowComplexityRegions}
+        borderColor="blackAlpha.600"
+        sx={{
+          ".chakra-checkbox__control": {
+            bg: "white",
+          },
+        }}
+      >
+        Low complexity regions
+      </Checkbox>
     </Flex>
   );
 };
 
-const Mask = ({
-  alignmentTool,
-  handleMaskForLookupTableOnly,
-  handleMaskLowerCaseLetters,
-}) => {
+const Mask = ({ handleMaskForLookupTableOnly, handleMaskLowerCaseLetters }) => {
   return (
     <Flex mb="2">
       <Text w="150px" lineHeight="1">
@@ -987,32 +882,18 @@ const Mask = ({
       <Divider orientation="vertical" borderColor="gray.600" h="50px" mr="4" />
       <Box>
         <Box>
-          {alignmentTool == "blastn" ? (
-            <Checkbox
-              defaultChecked
-              onChange={handleMaskForLookupTableOnly}
-              borderColor="blackAlpha.600"
-              sx={{
-                ".chakra-checkbox__control": {
-                  bg: "white",
-                },
-              }}
-            >
-              Mask for lookup table only
-            </Checkbox>
-          ) : (
-            <Checkbox
-              onChange={handleMaskForLookupTableOnly}
-              borderColor="blackAlpha.600"
-              sx={{
-                ".chakra-checkbox__control": {
-                  bg: "white",
-                },
-              }}
-            >
-              Mask for lookup table only
-            </Checkbox>
-          )}
+          <Checkbox
+            defaultChecked
+            onChange={handleMaskForLookupTableOnly}
+            borderColor="blackAlpha.600"
+            sx={{
+              ".chakra-checkbox__control": {
+                bg: "white",
+              },
+            }}
+          >
+            Mask for lookup table only
+          </Checkbox>
         </Box>
         <Box>
           <Checkbox
