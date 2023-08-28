@@ -54,7 +54,7 @@ const AlignmentToolForm = ({ alignmentTool }) => {
           <Button
             colorScheme={p == alignmentTool ? "blue" : "gray"}
             onClick={() => {
-              navigate("blast/" + { p });
+              navigate("/blast/" + p);
             }}
             key={p}
           >
@@ -67,6 +67,9 @@ const AlignmentToolForm = ({ alignmentTool }) => {
 };
 
 const EnterQuerySequence = ({
+  alignmentTool,
+  geneticCode,
+  handleGeneticCodeChange,
   queryRef,
   handleQueryFile,
   jobTitleRef,
@@ -105,6 +108,14 @@ const EnterQuerySequence = ({
         />
         <File handleFile={handleQueryFile} />
         <JobTitle jobTitleRef={jobTitleRef} />
+        {alignmentTool == "blastx" || alignmentTool == "tblastx" ? (
+          <GeneticCode
+            geneticCode={geneticCode}
+            handleGeneticCodeChange={handleGeneticCodeChange}
+          />
+        ) : (
+          <div />
+        )}
         <Align23
           handleAlignTwoOrMoreSequences={handleAlignTwoOrMoreSequences}
         />
@@ -156,7 +167,7 @@ const Query = ({
               onChange={handleSubrangeFromChange}
               bgColor="white"
               borderColor="gray.400"
-              w="100px"
+              w="150px"
             >
               <NumberInputField></NumberInputField>
             </NumberInput>
@@ -172,7 +183,7 @@ const Query = ({
               onChange={handleSubrangeToChange}
               bgColor="white"
               borderColor="gray.400"
-              w="100px"
+              w="150px"
             >
               <NumberInputField></NumberInputField>
             </NumberInput>
@@ -193,6 +204,76 @@ const File = ({ handleFile }) => {
   );
 };
 
+//https://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/index.cgi?chapter=cgencodes
+const GeneticCode = ({ geneticCode, handleGeneticCodeChange }) => {
+  const geneticCodeOptions = [
+    { id: 1, value: "1", label: "Standard (1)" },
+    { id: 2, value: "2", label: "Vertebrate Mitochondrial (2)" },
+    { id: 3, value: "3", label: "Yeast Mitochondrial (3)" },
+    {
+      id: 4,
+      value: "4",
+      label: "Mold Mitochondrial; ... (4)",
+    },
+    { id: 5, value: "5", label: "Invertebrate Mitochondrial (5)" },
+    {
+      id: 6,
+      value: "6",
+      label: "Ciliate Nuclear; ... (6)",
+    },
+    {
+      id: 9,
+      value: "9",
+      label: "Echinoderm and Flatworm Mitochondrial (9)",
+    },
+    { id: 10, value: "10", label: "Euplotid Nuclear (10)" },
+    { id: 11, value: "11", label: "Bacterial and Archea (11)" },
+    { id: 12, value: "12", label: "Alternative Yeast Nuclear (12)" },
+    { id: 13, value: "13", label: "Ascidian Mitochondrial (13)" },
+    { id: 14, value: "14", label: "Flatworm Mitochondrial (14)" },
+    { id: 15, value: "15", label: "Blepharisma Macronuclear (15)" },
+    { id: 16, value: "16", label: "Chlorophycean Mitochondrial (16)" },
+    { id: 21, value: "21", label: "Trematode Mitochondrial (21)" },
+    { id: 22, value: "22", label: "Scenedesmus obliquus Mitochondrial (22)" },
+    { id: 23, value: "23", label: "Thraustochytrium Mitochondrial (23)" },
+    { id: 24, value: "24", label: "Pterobranchia Mitochondrial (24)" },
+    {
+      id: 25,
+      value: "25",
+      label: "Candidate Division SR1 and Gracilibacteria (25)",
+    },
+    { id: 26, value: "26", label: "Pachysolen tannophilus Nuclear (26)" },
+    { id: 27, value: "27", label: "Karyorelict Nuclear (27)" },
+    { id: 28, value: "28", label: "Condylostoma Nuclear (28)" },
+    { id: 29, value: "29", label: "Mesodinium Nuclear (29)" },
+    { id: 30, value: "30", label: "Peritrich Nuclear (30)" },
+    { id: 31, value: "31", label: "Blastocrithidia Nuclear (31)" },
+    { id: 33, value: "33", label: "Cephalodiscidae Mitochondrial (33)" },
+  ];
+
+  return (
+    <Flex mb="2">
+      <Text w="150px" lineHeight="1">
+        Genetic code
+      </Text>
+      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
+      <Select
+        value={geneticCode}
+        onChange={handleGeneticCodeChange}
+        bgColor="white"
+        borderColor="gray.400"
+        w="400px"
+      >
+        {geneticCodeOptions.map((option) => (
+          <option value={option.value} key={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </Flex>
+  );
+};
+
 const JobTitle = ({ jobTitleRef }) => {
   return (
     <Flex>
@@ -203,7 +284,7 @@ const JobTitle = ({ jobTitleRef }) => {
         bgColor="white"
         mb="2"
         borderColor="gray.400"
-        w="600px"
+        w="550px"
       />
     </Flex>
   );
@@ -292,8 +373,8 @@ const EnterSubjectSequence = ({ queryRef, handleFile, fromRef, toRef }) => {
 const ProgramSelection = ({
   alignmentTool,
   task,
+  handleTaskChange,
   handleSubmit,
-  setTask,
   maxTargetSequences,
   setMaxTargetSequences,
   handleMaxTargetSequencesChange,
@@ -310,49 +391,46 @@ const ProgramSelection = ({
   gapCosts,
   setGapCosts,
   handleGapCostsChange,
+  matrix,
+  handleMatrixChange,
+  compositionalAdjustments,
+  handleCompositionalAdjustmentsChange,
   handleFilterLowComplexityRegions,
   handleMaskForLookupTableOnly,
   handleMaskLowerCaseLetters,
 }) => {
   return (
     <>
-      <Box
-        p="2"
-        mb="8"
-        bgColor="gray.100"
-        borderWidth="1px"
-        borderColor="gray.400"
-        borderRadius="lg"
-      >
-        {alignmentTool == "blastn" ? (
-          <>
-            <Title title="Program Selection" />
+      {alignmentTool == "blastn" || alignmentTool == "blastp" ? (
+        <Box
+          p="2"
+          mb="8"
+          bgColor="gray.100"
+          borderWidth="1px"
+          borderColor="gray.400"
+          borderRadius="lg"
+        >
+          <Title title="Program Selection" />
+          {alignmentTool == "blastn" ? (
             <OptimizeFor
               alignmentTool={alignmentTool}
               task={task}
               handleTaskChange={handleTaskChange}
             />
-          </>
-        ) : (
-          <></>
-        )}
-        {alignmentTool == "blastp" ? (
-          <>
-            <Title title="Program Selection" />
+          ) : (
             <Algorithm
               alignmentTool={alignmentTool}
               task={task}
               handleTaskChange={handleTaskChange}
             />
-          </>
-        ) : (
-          <></>
-        )}
-      </Box>
+          )}
+        </Box>
+      ) : (
+        <></>
+      )}
       <Button onClick={handleSubmit} colorScheme="blue" mt="-4" mb="8">
         SUBMIT
       </Button>
-
       <GeneralParameters
         alignmentTool={alignmentTool}
         task={task}
@@ -366,22 +444,38 @@ const ProgramSelection = ({
         maxMatches={maxMatches}
         handleMaxMatchesChange={handleMaxMatchesChange}
       />
-      <ScoringParameters
-        alignmentTool={alignmentTool}
-        task={task}
-        matchScore={matchScore}
-        handleMatchScoreChange={handleMatchScoreChange}
-        gapCosts={gapCosts}
-        setGapCosts={setGapCosts}
-        handleGapCostsChange={handleGapCostsChange}
-      />
+      {alignmentTool == "blastn" ? (
+        <ScoringParameters
+          alignmentTool={alignmentTool}
+          task={task}
+          matchScore={matchScore}
+          handleMatchScoreChange={handleMatchScoreChange}
+          gapCosts={gapCosts}
+          setGapCosts={setGapCosts}
+          handleGapCostsChange={handleGapCostsChange}
+        />
+      ) : (
+        <ScoringParameters2
+          alignmentTool={alignmentTool}
+          task={task}
+          matrix={matrix}
+          handleMatrixChange={handleMatrixChange}
+          compositionalAdjustments={compositionalAdjustments}
+          handleCompositionalAdjustmentsChange={
+            handleCompositionalAdjustmentsChange
+          }
+          gapCosts={gapCosts}
+          setGapCosts={setGapCosts}
+          handleGapCostsChange={handleGapCostsChange}
+        />
+      )}
       <FiltersAndMasking
         alignmentTool={alignmentTool}
         handleFilterLowComplexityRegions={handleFilterLowComplexityRegions}
         handleMaskForLookupTableOnly={handleMaskForLookupTableOnly}
         handleMaskLowerCaseLetters={handleMaskLowerCaseLetters}
       />
-      {alignmentTool == "blastn" && optimize == 1 ? (
+      {alignmentTool == "blastn" && task == "dc-megablast" ? (
         <DiscontiguousWordOptions />
       ) : (
         <div />
@@ -395,7 +489,7 @@ const OptimizeFor = ({ task, handleTaskChange }) => {
     <Flex mb="2">
       <Text w="150px">Optimize for </Text>
       <Divider orientation="vertical" h="90px" borderColor="gray.600" mr="4" />
-      <RadioGroup defaultValue="0">
+      <RadioGroup defaultValue="megablast">
         <Stack>
           <Radio
             value="megablast"
@@ -432,10 +526,10 @@ const Algorithm = ({ task, handleTaskChange }) => {
     <Flex mb="2">
       <Text w="150px">Algorithm </Text>
       <Divider orientation="vertical" h="90px" borderColor="gray.600" mr="4" />
-      <RadioGroup defaultValue="1">
+      <RadioGroup defaultValue="blastp">
         <Stack>
           <Radio
-            value="0"
+            value="blastp"
             bg="white"
             borderColor="blackAlpha.600"
             onChange={handleTaskChange}
@@ -443,7 +537,7 @@ const Algorithm = ({ task, handleTaskChange }) => {
             blastp (for standard protein-protein comparisons)
           </Radio>
           <Radio
-            value="1"
+            value="blastp-short"
             bg="white"
             borderColor="blackAlpha.600"
             onChange={handleTaskChange}
@@ -452,7 +546,7 @@ const Algorithm = ({ task, handleTaskChange }) => {
             residues)
           </Radio>
           <Radio
-            value="2"
+            value="blastp-fast"
             bg="white"
             borderColor="blackAlpha.600"
             onChange={handleTaskChange}
@@ -770,12 +864,12 @@ const ScoringParameters = ({
 
 const MatchScores = ({ matchScore, handleMatchScoreChange }) => {
   const matchScoresOptions = [
-    { id: 1, value: "[1, -2]", label: "1,-2" },
-    { id: 2, value: "[1, -3]", label: "1,-3" },
-    { id: 3, value: "[1, -4]", label: "1,-4" },
-    { id: 4, value: "[2, -3]", label: "2,-3" },
-    { id: 5, value: "[4, -5]", label: "4,-5" },
-    { id: 6, value: "[1, -1]", label: "1,-1" },
+    { id: 1, value: "[1,-2]", label: "1,-2" },
+    { id: 2, value: "[1,-3]", label: "1,-3" },
+    { id: 3, value: "[1,-4]", label: "1,-4" },
+    { id: 4, value: "[2,-3]", label: "2,-3" },
+    { id: 5, value: "[4,-5]", label: "4,-5" },
+    { id: 6, value: "[1,-1]", label: "1,-1" },
   ];
 
   return (
@@ -802,45 +896,46 @@ const MatchScores = ({ matchScore, handleMatchScoreChange }) => {
 };
 
 const GapCosts = ({
-  optimize,
+  alignmentTool,
+  task,
   matchScore,
   gapCosts,
   setGapCosts,
   handleGapCostsChange,
 }) => {
   const temp1 = [
-    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 2, value: "[2, 2]", label: "Existence:2 Extension:2" },
-    { id: 3, value: "[1, 2]", label: "Existence:1 Extension:2" },
-    { id: 4, value: "[0, 2]", label: "Existence:0 Extension:2" },
-    { id: 5, value: "[3, 1]", label: "Existence:3 Extension:1" },
-    { id: 6, value: "[2, 1]", label: "Existence:2 Extension:1" },
-    { id: 7, value: "[1, 1]", label: "Existence:1 Extension:1" },
+    { id: 1, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[2,2]", label: "Existence:2 Extension:2" },
+    { id: 3, value: "[1,2]", label: "Existence:1 Extension:2" },
+    { id: 4, value: "[0,2]", label: "Existence:0 Extension:2" },
+    { id: 5, value: "[3,1]", label: "Existence:3 Extension:1" },
+    { id: 6, value: "[2,1]", label: "Existence:2 Extension:1" },
+    { id: 7, value: "[1,1]", label: "Existence:1 Extension:1" },
   ];
   const temp2 = [
-    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 2, value: "[2, 2]", label: "Existence:2 Extension:2" },
-    { id: 3, value: "[1, 2]", label: "Existence:1 Extension:2" },
-    { id: 4, value: "[0, 2]", label: "Existence:0 Extension:2" },
-    { id: 5, value: "[2, 1]", label: "Existence:2 Extension:1" },
-    { id: 6, value: "[1, 1]", label: "Existence:1 Extension:1" },
+    { id: 1, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[2,2]", label: "Existence:2 Extension:2" },
+    { id: 3, value: "[1,2]", label: "Existence:1 Extension:2" },
+    { id: 4, value: "[0,2]", label: "Existence:0 Extension:2" },
+    { id: 5, value: "[2,1]", label: "Existence:2 Extension:1" },
+    { id: 6, value: "[1,1]", label: "Existence:1 Extension:1" },
   ];
   const temp3 = [
-    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 2, value: "[1, 2]", label: "Existence:1 Extension:2" },
-    { id: 3, value: "[0, 2]", label: "Existence:0 Extension:2" },
-    { id: 4, value: "[2, 1]", label: "Existence:2 Extension:1" },
-    { id: 5, value: "[1, 1]", label: "Existence:1 Extension:1" },
+    { id: 1, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[1,2]", label: "Existence:1 Extension:2" },
+    { id: 3, value: "[0,2]", label: "Existence:0 Extension:2" },
+    { id: 4, value: "[2,1]", label: "Existence:2 Extension:1" },
+    { id: 5, value: "[1,1]", label: "Existence:1 Extension:1" },
   ];
   const temp4 = [
-    { id: 1, value: "[4, 4]", label: "Existence:4 Extension:4" },
-    { id: 2, value: "[2, 4]", label: "Existence:2 Extension:4" },
-    { id: 3, value: "[0, 4]", label: "Existence:0 Extension:4" },
-    { id: 4, value: "[3, 3]", label: "Existence:3 Extension:3" },
-    { id: 5, value: "[6, 2]", label: "Existence:6 Extension:2" },
-    { id: 6, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 7, value: "[4, 2]", label: "Existence:4 Extension:2" },
-    { id: 8, value: "[2, 2]", label: "Existence:2 Extension:2" },
+    { id: 1, value: "[4,4]", label: "Existence:4 Extension:4" },
+    { id: 2, value: "[2,4]", label: "Existence:2 Extension:4" },
+    { id: 3, value: "[0,4]", label: "Existence:0 Extension:4" },
+    { id: 4, value: "[3,3]", label: "Existence:3 Extension:3" },
+    { id: 5, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 6, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 7, value: "[4,2]", label: "Existence:4 Extension:2" },
+    { id: 8, value: "[2,2]", label: "Existence:2 Extension:2" },
   ];
   const temp5 = [
     { id: 1, value: "[12,8]", label: "Existence:12 Extension:8" },
@@ -850,39 +945,39 @@ const GapCosts = ({
     { id: 5, value: "[3,5]", label: "Existence:3 Extension:5" },
   ];
   const temp6 = [
-    { id: 1, value: "[5, 2]", label: "Existence:5 Extension:2" },
-    { id: 2, value: "[3, 2]", label: "Existence:3 Extension:2" },
-    { id: 3, value: "[2, 2]", label: "Existence:2 Extension:2" },
-    { id: 4, value: "[1, 2]", label: "Existence:1 Extension:2" },
-    { id: 5, value: "[0, 2]", label: "Existence:0 Extension:2" },
-    { id: 6, value: "[4, 1]", label: "Existence:4 Extension:1" },
-    { id: 7, value: "[3, 1]", label: "Existence:3 Extension:1" },
-    { id: 8, value: "[2, 1]", label: "Existence:2 Extension:1" },
+    { id: 1, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 2, value: "[3,2]", label: "Existence:3 Extension:2" },
+    { id: 3, value: "[2,2]", label: "Existence:2 Extension:2" },
+    { id: 4, value: "[1,2]", label: "Existence:1 Extension:2" },
+    { id: 5, value: "[0,2]", label: "Existence:0 Extension:2" },
+    { id: 6, value: "[4,1]", label: "Existence:4 Extension:1" },
+    { id: 7, value: "[3,1]", label: "Existence:3 Extension:1" },
+    { id: 8, value: "[2,1]", label: "Existence:2 Extension:1" },
   ];
 
   const matchScore2gapCosts = {
-    "[1, -2]": temp1,
-    "[1, -3]": temp2,
-    "[1, -4]": temp3,
-    "[2, -3]": temp4,
-    "[4, -5]": temp5,
-    "[1, -1]": temp6,
+    "[1,-2]": temp1,
+    "[1,-3]": temp2,
+    "[1,-4]": temp3,
+    "[2,-3]": temp4,
+    "[4,-5]": temp5,
+    "[1,-1]": temp6,
   };
 
   let gapCostsOptions = matchScore2gapCosts[matchScore];
-  if (optimize == 0 && matchScore != "[1, -1]") {
+  if (task == "megablast" && matchScore != "[1,-1]") {
     gapCostsOptions.unshift({ id: 0, value: "Linear", label: "Linear" });
   }
 
   useEffect(() => {
-    if (optimize == 0 && matchScore != "[1, -1]") {
+    if (task == "megablast" && matchScore != "[1,-1]") {
       setGapCosts("Linear");
-    } else if (matchScore === "[4, -5]") {
+    } else if (matchScore === "[4,-5]") {
       setGapCosts("[12,8]");
     } else {
-      setGapCosts("[5, 2]");
+      setGapCosts("[5,2]");
     }
-  }, [matchScore, optimize]);
+  }, [matchScore, task]);
 
   return (
     <Flex mb="2">
@@ -898,6 +993,296 @@ const GapCosts = ({
         w="250px"
       >
         {gapCostsOptions.map((option) => (
+          <option value={option.value} key={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </Flex>
+  );
+};
+
+const ScoringParameters2 = ({
+  alignmentTool,
+  task,
+  matrix,
+  handleMatrixChange,
+  compositionalAdjustments,
+  handleCompositionalAdjustmentsChange,
+  gapCosts,
+  setGapCosts,
+  handleGapCostsChange,
+}) => {
+  return (
+    <Box
+      p="2"
+      mb="8"
+      bgColor="gray.100"
+      borderWidth="1px"
+      borderColor="gray.400"
+      borderRadius="lg"
+    >
+      <Title title="Scoring Parameters" />
+      <Matrix matrix={matrix} handleMatrixChange={handleMatrixChange} />
+      {alignmentTool == "tblastx" ? (
+        <></>
+      ) : (
+        <>
+          <GapCosts2
+            alignmentTool={alignmentTool}
+            task={task}
+            matrix={matrix}
+            gapCosts={gapCosts}
+            setGapCosts={setGapCosts}
+            handleGapCostsChange={handleGapCostsChange}
+          />
+          <CompositionalAdjustments
+            compositionalAdjustments={compositionalAdjustments}
+            handleCompositionalAdjustmentsChange={
+              handleCompositionalAdjustmentsChange
+            }
+          />
+        </>
+      )}
+    </Box>
+  );
+};
+
+const Matrix = ({ matrix, handleMatrixChange }) => {
+  const matrixOptions = [
+    { id: 1, value: "PAM30", label: "PAM30" },
+    { id: 2, value: "PAM70", label: "PAM70" },
+    { id: 3, value: "PAM250", label: "PAM250" },
+    { id: 4, value: "BLOSUM80", label: "BLOSUM80" },
+    { id: 5, value: "BLOSUM62", label: "BLOSUM62" },
+    { id: 6, value: "BLOSUM45", label: "BLOSUM45" },
+    { id: 7, value: "BLOSUM50", label: "BLOSUM50" },
+    { id: 8, value: "BLOSUM90", label: "BLOSUM90" },
+  ];
+
+  return (
+    <Flex mb="2">
+      <Text w="150px" lineHeight="1">
+        Matrix
+      </Text>
+      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
+      <Select
+        value={matrix}
+        onChange={handleMatrixChange}
+        bgColor="white"
+        borderColor="gray.400"
+        w="150px"
+      >
+        {matrixOptions.map((option) => (
+          <option value={option.value} key={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </Flex>
+  );
+};
+
+const GapCosts2 = ({
+  alignmentTool,
+  task,
+  matrix,
+  gapCosts,
+  setGapCosts,
+  handleGapCostsChange,
+}) => {
+  const temp1 = [
+    { id: 1, value: "[7,2]", label: "Existence:7 Extension:2" },
+    { id: 2, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 3, value: "[5,2]", label: "Existence:5 Extension:2" },
+    { id: 4, value: "[10,1]", label: "Existence:10 Extension:1" },
+    { id: 5, value: "[9,1]", label: "Existence:9 Extension:1" },
+    { id: 6, value: "[8,1]", label: "Existence:8 Extension:1" },
+    { id: 7, value: "[13,3]", label: "Existence:13 Extension:3" },
+    { id: 8, value: "[15,3]", label: "Existence:15 Extension:3" },
+    { id: 9, value: "[14,1]", label: "Existence:14 Extension:1" },
+    { id: 10, value: "[14,2]", label: "Existence:14 Extension:2" },
+  ];
+  const temp2 = [
+    { id: 1, value: "[8,2]", label: "Existence:8 Extension:2" },
+    { id: 2, value: "[7,2]", label: "Existence:7 Extension:2" },
+    { id: 3, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 4, value: "[11,1]", label: "Existence:11 Extension:1" },
+    { id: 5, value: "[10,1]", label: "Existence:10 Extension:1" },
+    { id: 6, value: "[9,1]", label: "Existence:9 Extension:1" },
+    { id: 7, value: "[12,3]", label: "Existence:12 Extension:3" },
+    { id: 8, value: "[11,2]", label: "Existence:11 Extension:2" },
+  ];
+  const temp3 = [
+    { id: 1, value: "[15,3]", label: "Existence:15 Extension:3" },
+    { id: 2, value: "[14,3]", label: "Existence:14 Extension:3" },
+    { id: 3, value: "[13,3]", label: "Existence:13 Extension:3" },
+    { id: 4, value: "[12,3]", label: "Existence:12 Extension:3" },
+    { id: 5, value: "[11,3]", label: "Existence:11 Extension:3" },
+    { id: 6, value: "[17,2]", label: "Existence:17 Extension:2" },
+    { id: 7, value: "[16,2]", label: "Existence:16 Extension:2" },
+    { id: 8, value: "[15,2]", label: "Existence:15 Extension:2" },
+    { id: 9, value: "[14,2]", label: "Existence:14 Extension:2" },
+    { id: 10, value: "[13,2]", label: "Existence:13 Extension:2" },
+    { id: 11, value: "[21,1]", label: "Existence:21 Extension:1" },
+    { id: 12, value: "[20,1]", label: "Existence:20 Extension:1" },
+    { id: 13, value: "[19,1]", label: "Existence:19 Extension:1" },
+    { id: 14, value: "[18,1]", label: "Existence:18 Extension:1" },
+    { id: 15, value: "[17,1]", label: "Existence:17 Extension:1" },
+  ];
+  const temp4 = [
+    { id: 1, value: "[8,2]", label: "Existence:8 Extension:2" },
+    { id: 2, value: "[7,2]", label: "Existence:7 Extension:2" },
+    { id: 3, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 4, value: "[11,1]", label: "Existence:11 Extension:1" },
+    { id: 5, value: "[10,1]", label: "Existence:10 Extension:1" },
+    { id: 6, value: "[9,1]", label: "Existence:9 Extension:1" },
+  ];
+  const temp5 = [
+    { id: 1, value: "[11,2]", label: "Existence:11 Extension:2" },
+    { id: 2, value: "[10,2]", label: "Existence:10 Extension:2" },
+    { id: 3, value: "[9,2]", label: "Existence:9 Extension:2" },
+    { id: 4, value: "[8,2]", label: "Existence:8 Extension:2" },
+    { id: 5, value: "[7,2]", label: "Existence:7 Extension:2" },
+    { id: 6, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 7, value: "[13,1]", label: "Existence:13 Extension:1" },
+    { id: 8, value: "[12,1]", label: "Existence:12 Extension:1" },
+    { id: 9, value: "[11,1]", label: "Existence:11 Extension:1" },
+    { id: 10, value: "[10,1]", label: "Existence:10 Extension:1" },
+    { id: 11, value: "[9,1]", label: "Existence:9 Extension:1" },
+  ];
+  const temp6 = [
+    { id: 1, value: "[13,3]", label: "Existence:13 Extension:3" },
+    { id: 2, value: "[12,3]", label: "Existence:12 Extension:3" },
+    { id: 3, value: "[11,3]", label: "Existence:11 Extension:3" },
+    { id: 4, value: "[10,3]", label: "Existence:10 Extension:3" },
+    { id: 5, value: "[15,2]", label: "Existence:15 Extension:2" },
+    { id: 6, value: "[14,2]", label: "Existence:14 Extension:2" },
+    { id: 7, value: "[13,2]", label: "Existence:13 Extension:2" },
+    { id: 8, value: "[12,2]", label: "Existence:12 Extension:2" },
+    { id: 9, value: "[19,1]", label: "Existence:19 Extension:1" },
+    { id: 10, value: "[18,1]", label: "Existence:18 Extension:1" },
+    { id: 11, value: "[17,1]", label: "Existence:17 Extension:1" },
+    { id: 12, value: "[16,1]", label: "Existence:16 Extension:1" },
+  ];
+  const temp7 = [
+    { id: 1, value: "[13,3]", label: "Existence:13 Extension:3" },
+    { id: 2, value: "[12,3]", label: "Existence:12 Extension:3" },
+    { id: 3, value: "[11,3]", label: "Existence:11 Extension:3" },
+    { id: 4, value: "[10,3]", label: "Existence:10 Extension:3" },
+    { id: 5, value: "[9,3]", label: "Existence:9 Extension:3" },
+    { id: 6, value: "[16,2]", label: "Existence:16 Extension:2" },
+    { id: 7, value: "[15,2]", label: "Existence:15 Extension:2" },
+    { id: 8, value: "[14,2]", label: "Existence:14 Extension:2" },
+    { id: 9, value: "[13,2]", label: "Existence:13 Extension:2" },
+    { id: 10, value: "[12,2]", label: "Existence:12 Extension:2" },
+    { id: 11, value: "[19,1]", label: "Existence:19 Extension:1" },
+    { id: 12, value: "[18,1]", label: "Existence:18 Extension:1" },
+    { id: 13, value: "[17,1]", label: "Existence:17 Extension:1" },
+    { id: 14, value: "[16,1]", label: "Existence:16 Extension:1" },
+    { id: 15, value: "[15,1]", label: "Existence:15 Extension:1" },
+  ];
+  const temp8 = [
+    { id: 1, value: "[9,2]", label: "Existence:9 Extension:2" },
+    { id: 2, value: "[8,2]", label: "Existence:8 Extension:2" },
+    { id: 3, value: "[7,2]", label: "Existence:7 Extension:2" },
+    { id: 4, value: "[6,2]", label: "Existence:6 Extension:2" },
+    { id: 5, value: "[11,1]", label: "Existence:11 Extension:1" },
+    { id: 6, value: "[10,1]", label: "Existence:10 Extension:1" },
+    { id: 7, value: "[9,1]", label: "Existence:9 Extension:1" },
+  ];
+
+  const matrix2gapCosts = {
+    PAM30: temp1,
+    PAM70: temp2,
+    PAM250: temp3,
+    BLOSUM80: temp4,
+    BLOSUM62: temp5,
+    BLOSUM45: temp6,
+    BLOSUM50: temp7,
+    BLOSUM90: temp8,
+  };
+
+  let gapCostsOptions = matrix2gapCosts[matrix];
+
+  useEffect(() => {
+    if (task == "blastp-short" && matrix == "BLOSUM62") {
+      setGapCosts("[9,1]");
+    } else if (matrix == "BLOSUM62") {
+      setGapCosts("[11,1]");
+    } else if (matrix == "PAM30") {
+      setGapCosts("[9,1]");
+    } else if (matrix == "PAM70") {
+      setGapCosts("[10,1]");
+    } else if (matrix == "PAM250") {
+      setGapCosts("[14,2]");
+    } else if (matrix == "BLOSUM80") {
+      setGapCosts("[10,1]");
+    } else if (matrix == "BLOSUM45") {
+      setGapCosts("[15,2]");
+    } else if (matrix == "BLOSUM50") {
+      setGapCosts("[13,2]");
+    } else if (matrix == "BLOSUM90") {
+      setGapCosts("[10,1]");
+    }
+  }, [matrix, task]);
+
+  return (
+    <Flex mb="2">
+      <Text w="150px" lineHeight="1">
+        Gap Costs
+      </Text>
+      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
+      <Select
+        value={gapCosts}
+        onChange={handleGapCostsChange}
+        bgColor="white"
+        borderColor="gray.400"
+        w="250px"
+      >
+        {gapCostsOptions.map((option) => (
+          <option value={option.value} key={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    </Flex>
+  );
+};
+
+const CompositionalAdjustments = ({
+  compositionalAdjustments,
+  handleCompositionalAdjustmentsChange,
+}) => {
+  const options = [
+    { id: 1, value: "0", label: "No Adjustment" },
+    { id: 2, value: "1", label: "Composition-based statistics" },
+    {
+      id: 3,
+      value: "2",
+      label: "Conditional compositional score matrix adjustment",
+    },
+    {
+      id: 4,
+      value: "3",
+      label: "Universal compositional score matrix adjustment",
+    },
+  ];
+
+  return (
+    <Flex mb="2">
+      <Text w="150px" lineHeight="1">
+        Compositional Adjustments
+      </Text>
+      <Divider orientation="vertical" borderColor="gray.600" h="40px" mr="4" />
+      <Select
+        value={compositionalAdjustments}
+        onChange={handleCompositionalAdjustmentsChange}
+        bgColor="white"
+        borderColor="gray.400"
+        w="450px"
+      >
+        {options.map((option) => (
           <option value={option.value} key={option.id}>
             {option.label}
           </option>

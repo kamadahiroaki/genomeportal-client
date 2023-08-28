@@ -7,6 +7,10 @@ import { Header, Footer } from "./layout";
 import { Mypage } from "./mypage";
 import Jobresult from "./blast/jobresult";
 import Blastn from "./blast/blastn";
+import Blastp from "./blast/blastp";
+import Blastx from "./blast/blastx";
+import Tblastn from "./blast/tblastn";
+import Tblastx from "./blast/tblastx";
 import reportWebVitals from "./reportWebVitals";
 import theme from "./theme/theme";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -27,6 +31,10 @@ root.render(
           <Route exact path="/mypage" element={<Mypage />} />
           <Route exact path="/blast/jobresult" element={<Jobresult />} />
           <Route exact path="/blast/blastn" element={<Blastn />} />
+          <Route exact path="/blast/blastp" element={<Blastp />} />
+          <Route exact path="/blast/blastx" element={<Blastx />} />
+          <Route exact path="/blast/tblastn" element={<Tblastn />} />
+          <Route exact path="/blast/tblastx" element={<Tblastx />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

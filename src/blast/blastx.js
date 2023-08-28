@@ -12,8 +12,8 @@ import {
   EnterQuerySequence,
 } from "./blastSearchForms";
 
-function Blastn() {
-  const alignmentTool = "blastn";
+function Blastx() {
+  const alignmentTool = "blastx";
   const [querySequence, setQuerySequence] = useState("");
   const inputQuerySequence = useRef(querySequence);
   const [queryFrom, setQueryFrom] = useState(0);
@@ -34,6 +34,11 @@ function Blastn() {
     } else {
       setIsQueryFilePicked(true);
     }
+  };
+
+  const [geneticCode, setGeneticCode] = useState("1");
+  const handleGeneticCodeChange = (e) => {
+    setGeneticCode(e.target.value);
   };
 
   const [jobTitle, setJobTitle] = useState("");
@@ -72,17 +77,9 @@ function Blastn() {
   };
 
   const defaultValues = {
-    megablast: { ws: 28, ms: "[1,-2]", gc: "Linear" },
-    "dc-megablast": { ws: 11, ms: "[2,-3]", gc: "[5,2]" },
-    blastn: { ws: 18, ms: "[2,-3]", gc: "[5,2]" },
+    blastx: { ws: 5, gc: "[11,1]", ma: "BLOSUM62", ca: "2" },
   };
-  const [task, setTask] = useState("megablast");
-  const handleTaskChange = (e) => {
-    setTask(e.target.value);
-    setWordSize(defaultValues[e.target.value].ws);
-    setMatchScore(defaultValues[e.target.value].ms);
-    setGapCosts(defaultValues[e.target.value].gc);
-  };
+  const [task, setTask] = useState("blastx");
 
   const [maxTargetSequences, setMaxTargetSequences] = useState(100);
   const handleMaxTargetSequencesChange = (e) => {
@@ -102,13 +99,20 @@ function Blastn() {
   };
   const inputMaxMatches = useRef(maxMatches);
 
-  const [matchScore, setMatchScore] = useState(defaultValues[task].ms);
-  const handleMatchScoreChange = (e) => {
-    setMatchScore(e.target.value);
-  };
   const [gapCosts, setGapCosts] = useState(defaultValues[task].gc);
   const handleGapCostsChange = (e) => {
     setGapCosts(e.target.value);
+  };
+
+  const [matrix, setMatrix] = useState(defaultValues[task].ma);
+  const handleMatrixChange = (e) => {
+    setMatrix(e.target.value);
+  };
+  const [compositionalAdjustments, setCompositionalAdjustments] = useState(
+    defaultValues[task].ca
+  );
+  const handleCompositionalAdjustmentsChange = (e) => {
+    setCompositionalAdjustments(e.target.value);
   };
 
   const [filterLowComplexityRegions, setFilterLowComplexityRegions] =
@@ -116,22 +120,13 @@ function Blastn() {
   const handleFilterLowComplexityRegions = (e) => {
     setFilterLowComplexityRegions(e.target.checked);
   };
-  const [maskForLookupTableOnly, setMaskForLookupTableOnly] = useState(true);
+  const [maskForLookupTableOnly, setMaskForLookupTableOnly] = useState(false);
   const handleMaskForLookupTableOnly = (e) => {
     setMaskForLookupTableOnly(e.target.checked);
   };
   const [maskLowerCaseLetters, setMaskLowerCaseLetters] = useState(false);
   const handleMaskLowerCaseLetters = (e) => {
     setMaskLowerCaseLetters(e.target.checked);
-  };
-
-  const [templateLength, setTemplateLength] = useState(18);
-  const handleTemplateLength = (e) => {
-    setTemplateLength(e.target.value);
-  };
-  const [templateType, setTemplateType] = useState("coding");
-  const handleTemplateType = (e) => {
-    setTemplateType(e.target.value);
   };
 
   const navigate = useNavigate();
@@ -154,36 +149,28 @@ function Blastn() {
 
     const params = {
       alignmentTool: alignmentTool,
+      query_gencode: geneticCode,
       jobTitle: inputJobTitle.current.value,
       alignTwoOrMoreSequences: alignTwoOrMoreSequences,
-      task: task,
       evalue: expectedThreshold,
       word_size: wordSize,
       max_target_seqs: maxTargetSequences,
       culling_limit: maxMatches,
-      penalty: JSON.parse(matchScore)[1],
-      reward: JSON.parse(matchScore)[0],
+      matrix: matrix,
+      gapopen: JSON.parse(gapCosts)[0],
+      gapextend: JSON.parse(gapCosts)[1],
+      comp_based_stats: compositionalAdjustments,
       dust: filterLowComplexityRegions ? "yes" : "no",
       soft_masking: maskForLookupTableOnly,
-      //      lcase_masking: maskLowerCaseLetters,
     };
     if (!alignTwoOrMoreSequences) {
       params.db = database;
-    }
-    //https://www.ncbi.nlm.nih.gov/books/NBK279684/#_appendices_BLASTN_rewardpenalty_values_
-    if (gapCosts != "Linear") {
-      params.gapopen = JSON.parse(gapCosts)[0];
-      params.gapextend = JSON.parse(gapCosts)[1];
     }
     if (queryFrom >= 1 && queryTo >= queryFrom) {
       params.query_loc = queryFrom + "-" + queryTo;
     }
     if (subjectFrom >= 1 && subjectTo >= subjectFrom) {
       params.subject_loc = subjectFrom + "-" + subjectTo;
-    }
-    if (task == "dc-megablast") {
-      params.template_length = templateLength;
-      params.template_type = templateType;
     }
     if (maskLowerCaseLetters) {
       params.lcase_masking = "";
@@ -253,6 +240,8 @@ function Blastn() {
       >
         <EnterQuerySequence
           alignmentTool={alignmentTool}
+          geneticCode={geneticCode}
+          handleGeneticCodeChange={handleGeneticCodeChange}
           queryRef={inputQuerySequence}
           queryFrom={queryFrom}
           queryTo={queryTo}
@@ -273,9 +262,7 @@ function Blastn() {
         <ProgramSelection
           alignmentTool={alignmentTool}
           task={task}
-          handleTaskChange={handleTaskChange}
           handleSubmit={handleSubmit}
-          setTask={setTask}
           maxTargetSequences={maxTargetSequences}
           setMaxTargetSequences={setMaxTargetSequences}
           handleMaxTargetSequencesChange={handleMaxTargetSequencesChange}
@@ -286,9 +273,12 @@ function Blastn() {
           handleWordSizeChange={handleWordSizeChange}
           maxMatches={maxMatches}
           handleMaxMatchesChange={handleMaxMatchesChange}
-          matchScore={matchScore}
-          setMatchScore={setMatchScore}
-          handleMatchScoreChange={handleMatchScoreChange}
+          matrix={matrix}
+          handleMatrixChange={handleMatrixChange}
+          compositionalAdjustments={compositionalAdjustments}
+          handleCompositionalAdjustmentsChange={
+            handleCompositionalAdjustmentsChange
+          }
           gapCosts={gapCosts}
           setGapCosts={setGapCosts}
           handleGapCostsChange={handleGapCostsChange}
@@ -304,4 +294,4 @@ function Blastn() {
   );
 }
 
-export default Blastn;
+export default Blastx;
