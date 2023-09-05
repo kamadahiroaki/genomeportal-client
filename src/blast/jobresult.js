@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Button, Center, Flex, Box, Text, Divider } from "@chakra-ui/react";
+import {
+  Button,
+  Center,
+  Flex,
+  Box,
+  Text,
+  Divider,
+  Table,
+} from "@chakra-ui/react";
 import { serverUrl } from "../App.js";
 import axios from "axios";
 
@@ -119,6 +127,13 @@ const DataTable = (resdata) => {
     setIsTableVisible((prevIsTableVisible) => !prevIsTableVisible);
   };
 
+  const cbs = [
+    "No Adjustment",
+    "Composition-based statistics",
+    "Conditional compositional score matrix adjustment",
+    "Universal compositional score matrix adjustment",
+  ];
+
   return (
     <Box p="4">
       <Button onClick={toggleTableVisibility} mb="4">
@@ -137,11 +152,18 @@ const DataTable = (resdata) => {
             value={new Date(resdata.ended).toLocaleString()}
           />
           <Divider />
+          <TableItem label="Program" value={injson.alignmentTool} />
           <TableItem label="Title" value={injson.jobTitle} />
+          {injson.query_gencode ? (
+            <TableItem label="Gencode" value={injson.query_gencode} />
+          ) : null}
           {injson.alignTwoOrMoreSequences ? null : (
             <TableItem label="Database" value={injson.db} />
           )}
-          <TableItem label="Task" value={injson.task} />
+          {injson.alignmentTool == "blastn" ||
+          injson.alignmentTool == "blastp" ? (
+            <TableItem label="Task" value={injson.task} />
+          ) : null}
 
           <TableItem
             label="Max target sequences"
@@ -153,18 +175,31 @@ const DataTable = (resdata) => {
             label="Max matches in a query range"
             value={injson.culling_limit}
           />
-          <TableItem
-            label="Match/Mismatch scores"
-            value={"[" + injson.reward + "," + injson.penalty + "]"}
-          />
-          <TableItem
-            label="Gap costs"
-            value={
-              injson.gapopen
-                ? "[" + injson.gapopen + "," + injson.gapextend + "]"
-                : "Linear"
-            }
-          />
+          {injson.reward ? (
+            <TableItem
+              label="Match/Mismatch scores"
+              value={"[" + injson.reward + "," + injson.penalty + "]"}
+            />
+          ) : null}
+          {injson.matrix ? (
+            <TableItem label="Matrix" value={injson.matrix} />
+          ) : null}
+          {injson.gapopen ? (
+            <TableItem
+              label="Gap costs"
+              value={
+                injson.gapopen
+                  ? "[" + injson.gapopen + "," + injson.gapextend + "]"
+                  : "Linear"
+              }
+            />
+          ) : null}
+          {injson.comp_based_stats ? (
+            <TableItem
+              label="Composition statistics"
+              value={cbs[injson.comp_based_stats]}
+            />
+          ) : null}
           <TableItem
             label="Filter Low complexity regions"
             value={injson.dust === "yes" ? "Yes" : "No"}

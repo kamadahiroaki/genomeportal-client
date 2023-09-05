@@ -149,7 +149,7 @@ function Tblastx() {
       max_target_seqs: maxTargetSequences,
       culling_limit: maxMatches,
       matrix: matrix,
-      dust: filterLowComplexityRegions ? "yes" : "no",
+      seg: filterLowComplexityRegions ? "yes" : "no",
       soft_masking: maskForLookupTableOnly,
     };
     if (!alignTwoOrMoreSequences) {

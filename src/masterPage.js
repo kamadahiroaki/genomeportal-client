@@ -22,30 +22,7 @@ import {
 import { Link } from "react-router-dom";
 import { serverUrl } from "./App.js";
 
-const MypageButton = () => {
-  const navigate = useNavigate();
-  return (
-    <Button
-      colorScheme="pink"
-      onClick={() => {
-        navigate("mypage");
-      }}
-    >
-      MyPage
-    </Button>
-  );
-};
-
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  console.log("parts:", parts);
-  if (parts.length === 2) {
-    return parts.pop().split(";").shift();
-  }
-};
-
-const JobHistoryTable = ({ data }) => {
+const JobHistoryTable = ({ data, title }) => {
   const [isTableVisible, setIsTableVisible] = useState(false);
   const toggleTableVisibility = () => {
     setIsTableVisible(!isTableVisible);
@@ -53,7 +30,7 @@ const JobHistoryTable = ({ data }) => {
   return (
     <>
       <Button onClick={toggleTableVisibility} mb="4">
-        {isTableVisible ? "Hide job history" : "Show job history"}
+        {isTableVisible ? "Hide " + title : "Show " + title}
       </Button>
 
       {isTableVisible && (
@@ -66,7 +43,7 @@ const JobHistoryTable = ({ data }) => {
         >
           <TableContainer>
             <Table variant="simple">
-              <TableCaption placement="top">Job History</TableCaption>
+              <TableCaption placement="top">{title}</TableCaption>
               <Thead>
                 <Tr>
                   <Th>Job ID</Th>
@@ -104,11 +81,11 @@ const JobHistoryTable = ({ data }) => {
   );
 };
 
-const ViewJobHistory = () => {
+const ViewAllJobs = () => {
   const [jobHistory, setJobHistory] = useState([]);
   const getJobHistory = () => {
     axios
-      .get(serverUrl + "/usersJobs")
+      .get(serverUrl + "/allJobs")
       .then((res) => {
         console.log("jobHistory:", res.data);
         setJobHistory(res.data);
@@ -123,13 +100,45 @@ const ViewJobHistory = () => {
   return (
     <div>
       <div>
-        {jobHistory.length > 0 ? <JobHistoryTable data={jobHistory} /> : <></>}
+        {jobHistory.length > 0 ? (
+          <JobHistoryTable data={jobHistory} title={"all jobs"} />
+        ) : (
+          <></>
+        )}
+      </div>
+    </div>
+  );
+};
+const ViewUnfinishedJobs = () => {
+  const [jobHistory, setJobHistory] = useState([]);
+  const getJobHistory = () => {
+    axios
+      .get(serverUrl + "/unfinishedJobs")
+      .then((res) => {
+        console.log("jobHistory:", res.data);
+        setJobHistory(res.data);
+      })
+      .catch((err) => {
+        console.log("err:", err);
+      });
+  };
+  useEffect(() => {
+    getJobHistory();
+  }, []);
+  return (
+    <div>
+      <div>
+        {jobHistory.length > 0 ? (
+          <JobHistoryTable data={jobHistory} title={"unfinished jobs"} />
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
 };
 
-const Mypage = () => {
+const MasterPage = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState("");
@@ -140,8 +149,8 @@ const Mypage = () => {
         console.log("res.data:", res.data);
         setUser(res.data);
         console.log("user:", user);
-        if (res.data === "master") {
-          navigate("/masterPage");
+        if (res.data !== "master") {
+          navigate("/mypage");
         }
         if (!res.data) {
           navigate("/login");
@@ -155,9 +164,10 @@ const Mypage = () => {
 
   return (
     <>
-      <ViewJobHistory />
+      <ViewAllJobs />
+      <ViewUnfinishedJobs />
     </>
   );
 };
 
-export { Mypage, MypageButton };
+export { MasterPage };

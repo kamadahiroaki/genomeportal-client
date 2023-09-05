@@ -158,7 +158,7 @@ function Tblastn() {
       gapopen: JSON.parse(gapCosts)[0],
       gapextend: JSON.parse(gapCosts)[1],
       comp_based_stats: compositionalAdjustments,
-      dust: filterLowComplexityRegions ? "yes" : "no",
+      seg: filterLowComplexityRegions ? "yes" : "no",
       soft_masking: maskForLookupTableOnly,
     };
     if (!alignTwoOrMoreSequences) {

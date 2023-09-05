@@ -30,6 +30,34 @@ if (!fs.existsSync(master_file_path, fs.constants.F_OK)) {
   process.exit(1);
 }
 const master = JSON.parse(fs.readFileSync(master_file_path));
+db.get(
+  'SELECT * FROM "users" WHERE "email" = ?',
+  [master.username],
+  (err, row) => {
+    if (err) {
+      console.error(err);
+    }
+    if (!row) {
+      bcrypt.hash(master.password, 10, (err, hash) => {
+        if (err) throw err;
+
+        db.serialize(() => {
+          db.run("BEGIN TRANSACTION");
+          const stmt = db.prepare(
+            'INSERT INTO "users" ("email", "password") VALUES (?, ?)'
+          );
+          stmt.run(master.username, hash, (err) => {
+            if (err) {
+              console.error(err);
+            }
+          });
+          stmt.finalize();
+          db.run("COMMIT");
+        });
+      });
+    }
+  }
+);
 
 const server_file_path = "server.json";
 if (!fs.existsSync(server_file_path, fs.constants.F_OK)) {
@@ -196,7 +224,14 @@ const proxyOptions = {
   },
 };
 app.use(
-  ["/jobSubmit", "/jobResult", "/resultFile", "/usersJobs"],
+  [
+    "/jobSubmit",
+    "/jobResult",
+    "/resultFile",
+    "/usersJobs",
+    "/allJobs",
+    "/unfinishedJobs",
+  ],
   createProxyMiddleware(proxyOptions)
 );
 

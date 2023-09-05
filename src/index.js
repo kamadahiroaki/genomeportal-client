@@ -5,6 +5,7 @@ import { App } from "./App";
 import { LoginForm } from "./login";
 import { Header, Footer } from "./layout";
 import { Mypage } from "./mypage";
+import { MasterPage } from "./masterPage";
 import Jobresult from "./blast/jobresult";
 import Blastn from "./blast/blastn";
 import Blastp from "./blast/blastp";
@@ -29,6 +30,7 @@ root.render(
           <Route exact path="/App" element={<App />} />
           <Route exact path="/login" element={<LoginForm />} />
           <Route exact path="/mypage" element={<Mypage />} />
+          <Route exact path="/masterPage" element={<MasterPage />} />
           <Route exact path="/blast/jobresult" element={<Jobresult />} />
           <Route exact path="/blast/blastn" element={<Blastn />} />
           <Route exact path="/blast/blastp" element={<Blastp />} />
