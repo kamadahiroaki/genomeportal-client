@@ -215,7 +215,7 @@ function Blastn() {
     const postData = async (newData) => {
       //      navigate("/searching", { state: { params: params } });
       const response = await axios.post(serverUrl + "/jobSubmit", newData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        //        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       return response;
