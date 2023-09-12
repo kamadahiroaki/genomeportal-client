@@ -14,10 +14,13 @@ const path = require("path");
 const cors = require("cors");
 const fs = require("fs");
 const multer = require("multer");
-const upload = multer();
-const formidable = require("express-formidable");
-const busboy = require("busboy");
-const { on } = require("events");
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 1024 * 1024 * 10 },
+});
+const FormData = require("form-data");
+const axios = require("axios");
+const { checkParams } = require("./checkRequest.js");
 
 const db = new sqlite3.Database("react-server-db.sqlite3");
 db.serialize(() => {
@@ -185,266 +188,6 @@ app.post("/api/signup", (req, res) => {
   });
 });
 
-app.use(["/jobResult", "/resultFile"], (req, res, next) => {
-  const nonAllowedChars = /[^a-zA-Z0-9_]/;
-  if (req.query.jobid.match(nonAllowedChars) === null) {
-    return next();
-  } else {
-    return res.status(401).send("jobid error");
-  }
-});
-
-//app.use(formidable({ encoding: "utf-8", multiples: true }));
-//app.use("/jobSubmit", upload.array("files"), (req, res, next) => {
-app.use("/jobSubmita", (req, res, next) => {
-  console.log("req.is=multipart", req.is("multipart/form-data"));
-  console.log("typeof req.body", typeof req.body);
-  console.log("req.body:", req.body);
-  let errorType = "";
-
-  const busboyInstance = busboy({ headers: req.headers });
-  const formData = {};
-  busboyInstance.on("field", (fieldname, val) => {
-    if (fieldname === "params") {
-      formData.params = val;
-    }
-  });
-  busboyInstance.on("field", (name, val, info) => {
-    console.log(`Field [${name}]: value: %j`, val);
-  });
-  busboyInstance.on("finish", () => {
-    console.log("formData:", formData);
-    const params = JSON.parse(formData.params);
-    console.log("params:", params);
-    //    const paramsCheckResult = paramsCheck(params);
-    //    if (paramsCheckResult != "ok") {
-    //      return res.status(401).send(paramsCheckResult);
-    //    }
-  });
-  req.pipe(busboyInstance);
-
-  //  const params = JSON.parse(req.fields.params);
-  //  console.log("params:", params);
-
-  //  const params = JSON.parse(req.body.params);
-  const params = {};
-  const allowedParams = [
-    "alignmentTool",
-    "task",
-    "db",
-    "jobTitle",
-    "alignTwoOrMoreSequences",
-    "query_gencode",
-    "query_loc",
-    "subject_loc",
-    "evalue",
-    "word_size",
-    "max_target_seqs",
-    "culling_limit",
-    "gapopen",
-    "gapextend",
-    "penalty",
-    "reward",
-    "matrix",
-    "comp_based_stats",
-    "template_type",
-    "template_length",
-    "dust",
-    "seg",
-    "soft_masking",
-    "lcase_masking",
-  ];
-  if (
-    Object.getOwnPropertyNames(params).filter(
-      (key) => !allowedParams.includes(key)
-    ).length > 0
-  ) {
-    errorType = "params error";
-  }
-
-  const dbPattern = /^[a-zA-Z][a-zA-Z0-9_\-]*$/;
-  if (params.db && !dbPattern.test(params.db)) {
-    errorType = "db error";
-  }
-  const isNotNumeric = (str) => {
-    return str && !/^-?\d+(\.\d+)?$/.test(str);
-  };
-  if (isNotNumeric(params.evalue)) {
-    errorType = "evalue error";
-  }
-  if (isNotNumeric(params.word_size)) {
-    errorType = "word_size error";
-  }
-  if (isNotNumeric(params.max_target_seqs)) {
-    errorType = "max_target_seqs error";
-  }
-  if (isNotNumeric(params.culling_limit)) {
-    errorType = "culling_limit error";
-  }
-  if (isNotNumeric(params.gapopen)) {
-    errorType = "gapopen error";
-  }
-  if (isNotNumeric(params.gapextend)) {
-    errorType = "gapextend error";
-  }
-  if (isNotNumeric(params.penalty)) {
-    errorType = "penalty error";
-  }
-  if (isNotNumeric(params.reward)) {
-    errorType = "reward error";
-  }
-  if (isNotNumeric(params.template_length)) {
-    errorType = "template_length error";
-  }
-  if (isNotNumeric(params.query_gencode)) {
-    errorType = "query_gencode error";
-  }
-  if (isNotNumeric(params.comp_based_stats)) {
-    errorType = "comp_based_stats error";
-  }
-  const locPattern = /^\d+-\d+$/;
-  if (params.query_loc && !locPattern.test(params.query_loc)) {
-    errorType = "query_loc error";
-  }
-  if (params.subject_loc && !locPattern.test(params.subject_loc)) {
-    errorType = "subject_loc error";
-  }
-
-  const alignmentTool = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
-  const task = [
-    "megablast",
-    "dc-megablast",
-    "blastn",
-    "blastp",
-    "blastp-short",
-    "blastp-fast",
-    "blastx",
-    "tblastn",
-    "tblastx",
-  ];
-  const matrix = [
-    "BLOSUM45",
-    "BLOSUM50",
-    "BLOSUM62",
-    "BLOSUM80",
-    "BLOSUM90",
-    "PAM30",
-    "PAM70",
-    "PAM250",
-  ];
-  const templateType = ["coding", "coding_and_optimal", "optimal"];
-  const boolean = [
-    "yes",
-    "no",
-    "true",
-    "false",
-    "True",
-    "False",
-    "",
-    "TRUE",
-    "FALSE",
-    "YES",
-    "NO",
-    true,
-    false,
-  ];
-
-  if (
-    params.alignmentTool &&
-    alignmentTool.every((item) => item != params.alignmentTool)
-  ) {
-    errorType = "alignmentTool error";
-  }
-  if (params.task && task.every((item) => item != params.task)) {
-    errorType = "task error";
-  }
-  if (params.matrix && matrix.every((item) => item != params.matrix)) {
-    errorType = "matrix error";
-  }
-  if (
-    params.templateType &&
-    templateType.every((item) => item != params.template_type)
-  ) {
-    errorType = "template_type error";
-  }
-  if (params.dust && boolean.every((item) => item != params.dust)) {
-    errorType = "dust error";
-  }
-  if (params.seg && boolean.every((item) => item != params.seg)) {
-    errorType = "seg error";
-  }
-  if (
-    params.soft_masking &&
-    boolean.every((item) => item != params.soft_masking)
-  ) {
-    errorType = "soft_masking error";
-  }
-  if (
-    params.lcase_masking &&
-    boolean.every((item) => item != params.lcase_masking)
-  ) {
-    errorType = "lcase_masking error";
-  }
-  if (
-    params.alignTwoOrMoreSequences &&
-    boolean.every((item) => item != params.alignTwoOrMoreSequences)
-  ) {
-    errorType = "alignTwoOrMoreSequences error";
-  }
-  if (params.max_target_seqs == "1000") {
-    console.log("max_target_seqs error");
-    errorType = "max_target_seqs  1000 error";
-  }
-  if (errorType == "") {
-    console.log("next");
-    return next();
-  } else {
-    console.log("errorType:", errorType);
-    return res.status(401).send(errorType);
-  }
-});
-
-const proxyOptions = {
-  target: queueingServerUrl,
-  changeOrigin: true,
-  onProxyReq: (proxyReq, req, res) => {
-    if (req.isAuthenticated()) {
-      proxyReq.setHeader("user", req.user);
-    } else {
-      proxyReq.setHeader("user", "");
-    }
-
-    const encodedCredentials = Buffer.from(
-      `${master.username}:${master.password}`
-    ).toString("base64");
-    authorization = `Basic ${encodedCredentials}`;
-    proxyReq.setHeader("Authorization", authorization);
-
-    if (req.is("multipart/form-data")) {
-      // マルチパートリクエストのヘッダーを適切に設定
-      proxyReq.setHeader("Content-Type", req.get("Content-Type"));
-      proxyReq.setHeader("Content-Length", req.get("Content-Length"));
-
-      console.log("multipart/form-data");
-      // フォームデータのボディをそのままプロキシにパイプ
-      //        req.pipe(proxyReq);
-    } else if (req.body && typeof req.body === "object") {
-      console.log("object");
-      // リクエストボディがオブジェクト形式の場合、JSON形式に変換してプロキシに書き込む
-      const jsonData = JSON.stringify(req.body);
-      proxyReq.setHeader("Content-Type", "application/json");
-      proxyReq.setHeader("Content-Length", Buffer.byteLength(jsonData));
-      proxyReq.write(jsonData);
-    } else if (req.body && typeof req.body === "string") {
-      console.log("string");
-      // リクエストボディが文字列形式の場合、そのままプロキシに書き込む
-      proxyReq.write(req.body);
-    }
-  },
-  onProxyReqEnd: (proxyReq, req, res) => {
-    proxyReq.end();
-  },
-};
 app.use(
   [
     "/jobSubmit",
@@ -454,7 +197,69 @@ app.use(
     "/allJobs",
     "/unfinishedJobs",
   ],
-  createProxyMiddleware(proxyOptions)
+  upload.array("files"),
+  (req, res, next) => {
+    const headers = {};
+    if (req.isAuthenticated()) {
+      headers["user"] = req.user;
+    } else {
+      headers["user"] = "";
+    }
+
+    const encodedCredentials = Buffer.from(
+      `${master.username}:${master.password}`
+    ).toString("base64");
+    authorization = `Basic ${encodedCredentials}`;
+    headers.authorization = authorization;
+
+    const path = req.originalUrl;
+    if (path.startsWith("/jobSubmit")) {
+      const params = JSON.parse(req.body.params);
+      const errMessage = checkParams(params);
+      if (errMessage == "") {
+        const formData = new FormData();
+        formData.append("params", JSON.stringify(params));
+        req.files.forEach((file) => {
+          formData.append(
+            "files",
+            fs.createReadStream(file.path),
+            file.originalname
+          );
+        });
+        axios
+          .post(queueingServerUrl + path, formData, {
+            withCredentials: true,
+            headers: { ...formData.getHeaders(), ...headers },
+          })
+          .then((response) => {
+            return res.send(response.data);
+          })
+          .catch((error) => {
+            return res.send(error);
+          });
+      } else {
+        return res.status(401).send(errMessage);
+      }
+    } else {
+      if (path.startsWith("/jobResult") || path.startsWith("/resultFile")) {
+        const nonAllowedChars = /[^a-zA-Z0-9_]/;
+        if (req.query.jobid.match(nonAllowedChars)) {
+          return res.status(401).send("jobid error");
+        }
+      }
+      axios
+        .get(queueingServerUrl + path, {
+          withCredentials: true,
+          headers: headers,
+        })
+        .then((response) => {
+          return res.send(response.data);
+        })
+        .catch((error) => {
+          return res.send(error);
+        });
+    }
+  }
 );
 
 app.post("/debug", (req, res) => {
@@ -470,3 +275,55 @@ app.get("/*", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+// const proxyOptions = {
+//   target: queueingServerUrl,
+//   changeOrigin: true,
+//   onProxyReq: (proxyReq, req, res) => {
+//     if (req.isAuthenticated()) {
+//       proxyReq.setHeader("user", req.user);
+//     } else {
+//       proxyReq.setHeader("user", "");
+//     }
+
+//     const encodedCredentials = Buffer.from(
+//       `${master.username}:${master.password}`
+//     ).toString("base64");
+//     authorization = `Basic ${encodedCredentials}`;
+//     proxyReq.setHeader("Authorization", authorization);
+
+//     if (req.is("multipart/form-data")) {
+//       // マルチパートリクエストのヘッダーを適切に設定
+//       proxyReq.setHeader("Content-Type", req.get("Content-Type"));
+//       proxyReq.setHeader("Content-Length", req.get("Content-Length"));
+
+//       console.log("multipart/form-data");
+//       // フォームデータのボディをそのままプロキシにパイプ
+//     } else if (req.body && typeof req.body === "object") {
+//       console.log("object");
+//       // リクエストボディがオブジェクト形式の場合、JSON形式に変換してプロキシに書き込む
+//       const jsonData = JSON.stringify(req.body);
+//       proxyReq.setHeader("Content-Type", "application/json");
+//       proxyReq.setHeader("Content-Length", Buffer.byteLength(jsonData));
+//       proxyReq.write(jsonData);
+//     } else if (req.body && typeof req.body === "string") {
+//       console.log("string");
+//       // リクエストボディが文字列形式の場合、そのままプロキシに書き込む
+//       proxyReq.write(req.body);
+//     }
+//   },
+//   onProxyReqEnd: (proxyReq, req, res) => {
+//     proxyReq.end();
+//   },
+// };
+// app.use(
+//   [
+//     "/jobSubmit",
+//     "/jobResult",
+//     "/resultFile",
+//     "/usersJobs",
+//     "/allJobs",
+//     "/unfinishedJobs",
+//   ],
+//   createProxyMiddleware(proxyOptions)
+// );
