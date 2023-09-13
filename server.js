@@ -236,6 +236,15 @@ app.use(
           })
           .catch((error) => {
             return res.send(error);
+          })
+          .finally(() => {
+            req.files.forEach((file) => {
+              fs.unlink(file.path, (err) => {
+                if (err) {
+                  console.error(err);
+                }
+              });
+            });
           });
       } else {
         return res.status(401).send(errMessage);
