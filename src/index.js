@@ -12,6 +12,7 @@ import Blastp from "./blast/blastp";
 import Blastx from "./blast/blastx";
 import Tblastn from "./blast/tblastn";
 import Tblastx from "./blast/tblastx";
+import Test from "./test";
 import reportWebVitals from "./reportWebVitals";
 import theme from "./theme/theme";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -37,6 +38,7 @@ root.render(
           <Route exact path="/blast/blastx" element={<Blastx />} />
           <Route exact path="/blast/tblastn" element={<Tblastn />} />
           <Route exact path="/blast/tblastx" element={<Tblastx />} />
+          <Route exact path="/test" element={<Test />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
