@@ -52,7 +52,7 @@ const JobHistoryTable = ({ data }) => {
   };
   return (
     <>
-      <Button onClick={toggleTableVisibility} mb="4">
+      <Button onClick={toggleTableVisibility} mb="2" border="1px" size="sm">
         {isTableVisible ? "Hide job history" : "Show job history"}
       </Button>
 

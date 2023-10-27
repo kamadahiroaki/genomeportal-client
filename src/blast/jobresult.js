@@ -11,27 +11,30 @@ import {
 } from "@chakra-ui/react";
 import { serverUrl } from "../App.js";
 import axios from "axios";
+import blasterjs from "biojs-vis-blasterjs";
+import html2canvas from "./html2canvas.js";
 
 const Jobresult = () => {
   const location = useLocation();
-  console.log("location.href:", location.href);
   const searchParams = new URLSearchParams(location.search);
   const jobid = searchParams.get("jobid");
-  console.log("jobid:", jobid);
   const [text, setText] = useState("connecting...");
   const [resdata, setResdata] = useState("");
-  const [htmlContent, setHtmlContent] = useState("");
+  //  const [htmlContent, setHtmlContent] = useState("");
+  const [xmlData, setXmlData] = useState("");
+  const [txtData, setTxtData] = useState("");
+  const [errData, setErrData] = useState("");
 
   useEffect(() => {
     if (jobid == null) {
       setText("no such job");
+      console.log("no such job");
     } else {
       const jobUrl = "/jobResult?jobid=" + jobid;
       const url = serverUrl + jobUrl;
 
-      const timeout = 3600 * 24 * 7;
+      const timeout = 3600 * 24;
       const fetchResultInterval = async (sec) => {
-        console.log("url:", url);
         await axios
           .get(url)
           .then((res) => {
@@ -41,14 +44,31 @@ const Jobresult = () => {
               setText("Job ID: " + jobid + " does not exist");
             } else {
               setResdata(res.data);
-
               if (res.data.ended != null) {
                 setResdata(res.data);
                 setText(res.data.outjson);
                 axios
-                  .get(serverUrl + "/resultFile?jobid=" + jobid)
+                  .get(serverUrl + "/resultFile?fileName=" + jobid + ".xml")
                   .then((res) => {
-                    setHtmlContent(res.data);
+                    if (res.status == 200) setXmlData(res.data);
+                  })
+                  .catch((err) => {
+                    console.log("err:", err);
+                  });
+                axios
+                  .get(serverUrl + "/resultFile?fileName=" + jobid + ".txt")
+                  .then((res) => {
+                    if (res.status == 200) setTxtData(res.data);
+                  })
+                  .catch((err) => {
+                    console.log("err:", err);
+                  });
+                axios
+                  .get(serverUrl + "/resultFile?fileName=" + jobid + ".err")
+                  .then((res) => {
+                    if (res.status == 200) {
+                      setErrData(res.data);
+                    }
                   })
                   .catch((err) => {
                     console.log("err:", err);
@@ -70,21 +90,43 @@ const Jobresult = () => {
 
       fetchResultInterval(5);
     }
-  }, [jobid]);
+  }, []);
 
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/");
   };
 
+  const [viewBlaster, setViewBlaster] = useState(true);
+  const handleViewBlaster = () => {
+    setViewBlaster(!viewBlaster);
+  };
+
   return (
     <div>
-      {htmlContent ? (
+      {xmlData && txtData ? (
         <div>
+          <Button m="1" border="1px" size="sm">
+            Blaster
+          </Button>
+          <DownloadFileButton fileName={jobid + ".xml"} fileData={xmlData} />
+          <DownloadFileButton fileName={jobid + ".txt"} fileData={txtData} />
           <DataTable {...resdata} />
-          <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+          <Button m="1" border="1px" size="sm" onClick={handleViewBlaster}>
+            {viewBlaster ? "Switch to Text View" : "Switch to Blaster View"}
+          </Button>
+          {viewBlaster ? (
+            <Blaster alignments={xmlData} />
+          ) : (
+            <pre>{txtData}</pre>
+          )}
         </div>
       ) : (
+        // ) : errData ? (
+        //   <div>
+        //     <DataTable {...resdata} />
+        //     <pre>{errData}</pre>
+        //   </div>
         <div>
           <p>{text}</p>
           {resdata ? (
@@ -103,6 +145,44 @@ const Jobresult = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const Blaster = ({ alignments }) => {
+  useEffect(() => {
+    const instance = new blasterjs({
+      string: alignments,
+      multipleAlignments: "blast-multiple-alignments",
+      alignmentsTable: "blast-alignments-table",
+      singleAlignment: "blast-single-alignment",
+      html2canvas: html2canvas,
+    });
+  }, []);
+  return (
+    <div>
+      <div id="blast-multiple-alignments"></div>
+      <div id="blast-alignments-table"></div>
+      <div id="blast-single-alignment"></div>
+    </div>
+  );
+};
+
+const DownloadFileButton = ({ fileName, fileData }) => {
+  const handleClick = () => {
+    const blob = new Blob([fileData], { type: "text/plain" });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+  return (
+    <Button onClick={handleClick} m="1" border="1px" size="sm">
+      Download {fileName.slice(-3)}
+    </Button>
   );
 };
 
@@ -135,8 +215,8 @@ const DataTable = (resdata) => {
   ];
 
   return (
-    <Box p="4">
-      <Button onClick={toggleTableVisibility} mb="4">
+    <Box p="1">
+      <Button onClick={toggleTableVisibility} border="1px" size="sm">
         {isTableVisible ? "Hide job description" : "Show job description"}
       </Button>
 

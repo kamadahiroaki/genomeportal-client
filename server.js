@@ -250,10 +250,15 @@ app.use(
         return res.status(401).send(errMessage);
       }
     } else {
-      if (path.startsWith("/jobResult") || path.startsWith("/resultFile")) {
+      if (path.startsWith("/jobResult")) {
         const nonAllowedChars = /[^a-zA-Z0-9_]/;
         if (req.query.jobid.match(nonAllowedChars)) {
           return res.status(401).send("jobid error");
+        }
+      } else if (path.startsWith("/resultFile")) {
+        const nonAllowedChars = /[^a-zA-Z0-9_.]/;
+        if (req.query.fileName.match(nonAllowedChars)) {
+          return res.status(401).send("fileName error");
         }
       }
       axios
