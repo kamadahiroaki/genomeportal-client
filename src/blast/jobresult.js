@@ -11,8 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { serverUrl } from "../App.js";
 import axios from "axios";
-import blasterjs from "biojs-vis-blasterjs";
-import html2canvas from "./html2canvas.js";
+import { VisualizeBlastXml } from "./visualizeBlastXml.js";
 
 const Jobresult = () => {
   const location = useLocation();
@@ -106,20 +105,14 @@ const Jobresult = () => {
     <div>
       {xmlData && txtData ? (
         <div>
-          <Button m="1" border="1px" size="sm">
-            Blaster
-          </Button>
-          <DownloadFileButton fileName={jobid + ".xml"} fileData={xmlData} />
-          <DownloadFileButton fileName={jobid + ".txt"} fileData={txtData} />
+          {/* <DownloadFileButton fileName={jobid + ".xml"} fileData={xmlData} />
+          <DownloadFileButton fileName={jobid + ".txt"} fileData={txtData} /> */}
           <DataTable {...resdata} />
-          <Button m="1" border="1px" size="sm" onClick={handleViewBlaster}>
+          {/* <Button m="1" border="1px" size="sm" onClick={handleViewBlaster}>
             {viewBlaster ? "Switch to Text View" : "Switch to Blaster View"}
-          </Button>
-          {viewBlaster ? (
-            <Blaster alignments={xmlData} />
-          ) : (
-            <pre>{txtData}</pre>
-          )}
+          </Button> */}
+          {/* <pre>{txtData}</pre> */}
+          <VisualizeBlastXml xmlData={xmlData} />
         </div>
       ) : (
         // ) : errData ? (
@@ -144,25 +137,6 @@ const Jobresult = () => {
           ) : null}
         </div>
       )}
-    </div>
-  );
-};
-
-const Blaster = ({ alignments }) => {
-  useEffect(() => {
-    const instance = new blasterjs({
-      string: alignments,
-      multipleAlignments: "blast-multiple-alignments",
-      alignmentsTable: "blast-alignments-table",
-      singleAlignment: "blast-single-alignment",
-      html2canvas: html2canvas,
-    });
-  }, []);
-  return (
-    <div>
-      <div id="blast-multiple-alignments"></div>
-      <div id="blast-alignments-table"></div>
-      <div id="blast-single-alignment"></div>
     </div>
   );
 };

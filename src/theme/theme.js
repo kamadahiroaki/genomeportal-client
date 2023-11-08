@@ -12,6 +12,16 @@ const theme = extendTheme({
       },
     },
   },
+  components: {
+    Table: {
+      parts: ["th"],
+      baseStyle: {
+        th: {
+          textTransform: "none",
+        },
+      },
+    },
+  },
 });
 
 export default theme;

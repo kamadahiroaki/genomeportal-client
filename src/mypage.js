@@ -52,13 +52,13 @@ const JobHistoryTable = ({ data }) => {
   };
   return (
     <>
-      <Button onClick={toggleTableVisibility} mb="2" border="1px" size="sm">
+      <Button onClick={toggleTableVisibility} m="1" border="1px" size="sm">
         {isTableVisible ? "Hide job history" : "Show job history"}
       </Button>
 
       {isTableVisible && (
         <Box
-          margin="2"
+          margin="1"
           borderWidth="1px"
           borderColor="gray.200"
           borderRadius="lg"
@@ -66,7 +66,7 @@ const JobHistoryTable = ({ data }) => {
         >
           <TableContainer>
             <Table variant="simple">
-              <TableCaption placement="top">Job History</TableCaption>
+              {/* <TableCaption placement="top">Job History</TableCaption> */}
               <Thead>
                 <Tr>
                   <Th>Job ID</Th>
