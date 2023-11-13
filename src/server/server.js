@@ -1,5 +1,4 @@
 const http = require("http");
-const fs = require("fs");
 const url = require("url");
 
 let clients = [];
@@ -30,12 +29,11 @@ server.on("request", (request, response) => {
         data += chunk;
       })
       .on("end", () => {
-        const params=JSON.parse(data);
+        const params = JSON.parse(data);
         console.log(data);
         response.write(data);
         response.end();
       });
-    
   } else {
     response.writeHead(200, {
       "Content-Type": "text/event-stream",

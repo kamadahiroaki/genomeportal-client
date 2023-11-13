@@ -7,9 +7,6 @@ const bcrypt = require("bcrypt");
 const sqlite3 = require("sqlite3").verbose();
 const app = express();
 const port = process.env.PORT || 5000;
-const httpProxy = require("http-proxy");
-const proxy = httpProxy.createProxyServer({});
-const { createProxyMiddleware } = require("http-proxy-middleware");
 const path = require("path");
 const cors = require("cors");
 const fs = require("fs");
@@ -142,7 +139,7 @@ app.post(
   }
 );
 
-app.get("/api/logout", (req, res) => {
+app.get("/api/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) {
       console.error(err);
@@ -209,7 +206,7 @@ app.use(
     const encodedCredentials = Buffer.from(
       `${master.username}:${master.password}`
     ).toString("base64");
-    authorization = `Basic ${encodedCredentials}`;
+    const authorization = `Basic ${encodedCredentials}`;
     headers.authorization = authorization;
 
     const path = req.originalUrl;
@@ -289,55 +286,3 @@ app.get("/*", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-// const proxyOptions = {
-//   target: queueingServerUrl,
-//   changeOrigin: true,
-//   onProxyReq: (proxyReq, req, res) => {
-//     if (req.isAuthenticated()) {
-//       proxyReq.setHeader("user", req.user);
-//     } else {
-//       proxyReq.setHeader("user", "");
-//     }
-
-//     const encodedCredentials = Buffer.from(
-//       `${master.username}:${master.password}`
-//     ).toString("base64");
-//     authorization = `Basic ${encodedCredentials}`;
-//     proxyReq.setHeader("Authorization", authorization);
-
-//     if (req.is("multipart/form-data")) {
-//       // マルチパートリクエストのヘッダーを適切に設定
-//       proxyReq.setHeader("Content-Type", req.get("Content-Type"));
-//       proxyReq.setHeader("Content-Length", req.get("Content-Length"));
-
-//       console.log("multipart/form-data");
-//       // フォームデータのボディをそのままプロキシにパイプ
-//     } else if (req.body && typeof req.body === "object") {
-//       console.log("object");
-//       // リクエストボディがオブジェクト形式の場合、JSON形式に変換してプロキシに書き込む
-//       const jsonData = JSON.stringify(req.body);
-//       proxyReq.setHeader("Content-Type", "application/json");
-//       proxyReq.setHeader("Content-Length", Buffer.byteLength(jsonData));
-//       proxyReq.write(jsonData);
-//     } else if (req.body && typeof req.body === "string") {
-//       console.log("string");
-//       // リクエストボディが文字列形式の場合、そのままプロキシに書き込む
-//       proxyReq.write(req.body);
-//     }
-//   },
-//   onProxyReqEnd: (proxyReq, req, res) => {
-//     proxyReq.end();
-//   },
-// };
-// app.use(
-//   [
-//     "/jobSubmit",
-//     "/jobResult",
-//     "/resultFile",
-//     "/usersJobs",
-//     "/allJobs",
-//     "/unfinishedJobs",
-//   ],
-//   createProxyMiddleware(proxyOptions)
-// );

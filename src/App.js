@@ -1,15 +1,8 @@
-import logo from "./logo.svg";
 import "./App.css";
-import React, { useState, useRef, useEffect } from "react";
-import { Container } from "@chakra-ui/react";
-import { Select, Textarea, Button } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ulid } from "ulid";
 import { useNavigate } from "react-router-dom";
-import { LoginForm, LoginButton, LogoutButton } from "./login";
 
-//const serverUrl = "http://localhost:8080";
-//const clientAuth = { username: "client", password: "client" };
 const serverUrl = process.env.REACT_APP_SERVER_URL;
 
 function App() {

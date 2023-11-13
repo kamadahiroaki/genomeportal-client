@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { App } from "./App";
 import { LoginForm } from "./login";
-import { Header, Footer } from "./layout";
+import { Header } from "./layout";
 import { Mypage } from "./mypage";
 import { MasterPage } from "./masterPage";
 import Jobresult from "./blast/jobresult";
@@ -12,7 +12,6 @@ import Blastp from "./blast/blastp";
 import Blastx from "./blast/blastx";
 import Tblastn from "./blast/tblastn";
 import Tblastx from "./blast/tblastx";
-import Test from "./test";
 import reportWebVitals from "./reportWebVitals";
 import theme from "./theme/theme";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -38,7 +37,6 @@ root.render(
           <Route exact path="/blast/blastx" element={<Blastx />} />
           <Route exact path="/blast/tblastn" element={<Tblastn />} />
           <Route exact path="/blast/tblastx" element={<Tblastx />} />
-          <Route exact path="/test" element={<Test />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

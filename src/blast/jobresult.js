@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-  Button,
-  Center,
-  Flex,
-  Box,
-  Text,
-  Divider,
-  Table,
-} from "@chakra-ui/react";
+import { Button, Flex, Box, Text, Divider } from "@chakra-ui/react";
 import { serverUrl } from "../App.js";
 import axios from "axios";
 import { VisualizeBlastXml } from "./visualizeBlastXml.js";

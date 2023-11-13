@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   Box,
@@ -17,14 +17,10 @@ import {
   Th,
   Td,
 } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { serverUrl } from "../App.js";
 import { XMLParser, XMLValidator } from "fast-xml-parser";
-import { use } from "passport";
 
 const VisualizeBlastXml = ({ xmlData }) => {
   const parser = new XMLParser();
-  //  if (XMLValidator.validate(xml)) {
   const jsonObj = parser.parse(xmlData);
   const iteration = Array.isArray(
     jsonObj.BlastOutput.BlastOutput_iterations.Iteration
