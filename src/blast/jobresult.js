@@ -54,14 +54,14 @@ const Jobresult = () => {
                   .catch((err) => {
                     console.log("err:", err);
                   });
-                axios
-                  .get(serverUrl + "/resultFile?fileName=" + jobid + ".txt")
-                  .then((res) => {
-                    if (res.status == 200) setTxtData(res.data);
-                  })
-                  .catch((err) => {
-                    console.log("err:", err);
-                  });
+                // axios
+                //   .get(serverUrl + "/resultFile?fileName=" + jobid + ".txt")
+                //   .then((res) => {
+                //     if (res.status == 200) setTxtData(res.data);
+                //   })
+                //   .catch((err) => {
+                //     console.log("err:", err);
+                //   });
                 axios
                   .get(serverUrl + "/resultFile?fileName=" + jobid + ".err")
                   .then((res) => {
@@ -103,10 +103,11 @@ const Jobresult = () => {
 
   return (
     <div>
-      {xmlData && txtData ? (
+      {/* {xmlData && txtData ? ( */}
+      {xmlData ? (
         <div>
-          {/* <DownloadFileButton fileName={jobid + ".xml"} fileData={xmlData} />
-          <DownloadFileButton fileName={jobid + ".txt"} fileData={txtData} /> */}
+          {<DownloadFileButton fileName={jobid + ".xml"} fileData={xmlData} />}
+          {/* <DownloadFileButton fileName={jobid + ".txt"} fileData={txtData} /> */}
           <DataTable {...resdata} />
           {/* <Button m="1" border="1px" size="sm" onClick={handleViewBlaster}>
             {viewBlaster ? "Switch to Text View" : "Switch to Blaster View"}
