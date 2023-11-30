@@ -28,9 +28,7 @@ db.serialize(() => {
 
 const master_file_path = "master.json";
 if (!fs.existsSync(master_file_path, fs.constants.F_OK)) {
-  console.log(
-    "ERROR: master.json file not found. Please execute initializeenv.js first."
-  );
+  console.log("ERROR: master.json file not found.");
   process.exit(1);
 }
 const master = JSON.parse(fs.readFileSync(master_file_path));
@@ -65,13 +63,19 @@ db.get(
 
 const server_file_path = "server.json";
 if (!fs.existsSync(server_file_path, fs.constants.F_OK)) {
-  console.log(
-    "ERROR: server.json file not found. Please execute initializeenv.js first."
-  );
+  console.log("ERROR: server.json file not found.");
   process.exit(1);
 }
 const serverFile = JSON.parse(fs.readFileSync(server_file_path));
 const queueingServerUrl = serverFile.queueingServerUrl;
+
+const database_file_path = "database.json";
+if (!fs.existsSync(database_file_path, fs.constants.F_OK)) {
+  console.log("ERROR: database.json file not found.");
+  process.exit(1);
+}
+const nuclDatabaseList = JSON.parse(fs.readFileSync(database_file_path)).nucl;
+const protDatabaseList = JSON.parse(fs.readFileSync(database_file_path)).prot;
 
 app.use(express.static(path.join(__dirname, "build")));
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -117,6 +121,14 @@ app.get("/api/data", (req, res) => {
   res.json({ message: "Hello from Express!" });
 });
 
+app.get("/api/nuclDatabaseList", (req, res) => {
+  res.send(nuclDatabaseList);
+});
+
+app.get("/api/protDatabaseList", (req, res) => {
+  res.send(protDatabaseList);
+});
+
 app.get("/api/user", (req, res) => {
   if (req.isAuthenticated()) {
     res.send(req.user);
@@ -146,6 +158,7 @@ app.get("/api/logout", (req, res, next) => {
       return next(err);
     }
   });
+  console.log(req.user + " logged out");
   res.send(req.user + " logged out");
 });
 

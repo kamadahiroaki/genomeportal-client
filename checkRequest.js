@@ -45,7 +45,7 @@ const checkParams = (params) => {
     return "params error";
   }
 
-  const dbPattern = /^[a-zA-Z][a-zA-Z0-9_\-]*$/;
+  const dbPattern = /^[a-zA-Z0-9_.]*$/;
   if (params.db && !dbPattern.test(params.db)) {
     return "db error";
   }

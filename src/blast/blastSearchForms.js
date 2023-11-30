@@ -75,6 +75,7 @@ const EnterQuerySequence = ({
   handleSubjectFromChange,
   handleSubjectToChange,
   handleDatabase,
+  databaseList,
 }) => {
   return (
     <>
@@ -119,7 +120,10 @@ const EnterQuerySequence = ({
           handleSubrangeToChange={handleSubjectToChange}
         />
       ) : (
-        <ChooseSearchSet handleDatabase={handleDatabase} />
+        <ChooseSearchSet
+          handleDatabase={handleDatabase}
+          databaseList={databaseList}
+        />
       )}
     </>
   );
@@ -295,8 +299,14 @@ const Align23 = ({ handleAlignTwoOrMoreSequences }) => {
   );
 };
 
-const ChooseSearchSet = ({ handleDatabase }) => {
-  const database = [{ id: 1, value: "human", label: "human" }];
+const ChooseSearchSet = ({ handleDatabase, databaseList }) => {
+  //  const database = [{ id: 1, value: "human", label: "human" }];
+  const options = databaseList.map((item, index) => ({
+    id: index,
+    value: item,
+    label: item,
+  }));
+
   return (
     <Box
       padding="2"
@@ -318,13 +328,12 @@ const ChooseSearchSet = ({ handleDatabase }) => {
           mr="4"
         />
         <Select
-          //              value={gapCosts}
           onChange={handleDatabase}
           bgColor="white"
           borderColor="gray.400"
           w="250px"
         >
-          {database.map((option) => (
+          {options.map((option) => (
             <option value={option.value} key={option.id}>
               {option.label}
             </option>

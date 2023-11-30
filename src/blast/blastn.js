@@ -4,6 +4,7 @@ import { Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App.js";
+import { getNuclDatabaseList } from "./getDatabaseList.js";
 import {
   AlignmentToolForm,
   ProgramSelection,
@@ -64,10 +65,15 @@ function Blastn() {
     }
   };
 
-  const [database, setDatabase] = useState("human");
+  const [database, setDatabase] = useState("");
   const handleDatabase = (e) => {
     setDatabase(e.target.value);
   };
+  const [databaseList, setDatabaseList] = useState([]);
+  getNuclDatabaseList().then((res) => {
+    setDatabaseList(res);
+    setDatabase(res[0]);
+  });
 
   const defaultValues = {
     megablast: { ws: 28, ms: "[1,-2]", gc: "Linear" },
@@ -267,6 +273,7 @@ function Blastn() {
           handleSubjectToChange={handleSubjectToChange}
           handleSubjectFile={handleSubjectFile}
           handleDatabase={handleDatabase}
+          databaseList={databaseList}
         />
         <ProgramSelection
           alignmentTool={alignmentTool}

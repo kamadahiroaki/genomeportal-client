@@ -398,7 +398,7 @@ const Alignments = ({
             const maxpos = Math.max(queryEnd, hitEnd, queryStart, hitStart);
             const maxposLen = maxpos.toString().length;
             return (
-              <Box mb="8">
+              <Box mb="8" key={index}>
                 <Text>
                   Range {index + 1 + hspStart} : {hsp["Hsp_hit-from"]}-
                   {hsp["Hsp_hit-to"]}
@@ -422,7 +422,7 @@ const Alignments = ({
                 </Flex>
                 <Divider borderColor="gray" w="450px" />
                 {querySeqLines.map((item, index) => (
-                  <>
+                  <div key={index}>
                     <Flex mb="-2">
                       <Text fontFamily="Consolas, monospace" w="60px" mr="4">
                         Query
@@ -459,8 +459,13 @@ const Alignments = ({
                         w={`${maxposLen * 10}px`}
                         mr="4"
                       ></Text>
-                      <Text fontFamily="Consolas, monospace" mr="4">
-                        <pre>{midlineLines[index]}</pre>
+                      <Text
+                        fontFamily="Consolas, monospace"
+                        mr="4"
+                        style={{ whiteSpace: "pre" }}
+                      >
+                        {/* <pre>{midlineLines[index]}</pre> */}
+                        {midlineLines[index]}
                       </Text>
                     </Flex>
                     <Flex mb="2">
@@ -488,7 +493,7 @@ const Alignments = ({
                         )}
                       </Text>
                     </Flex>
-                  </>
+                  </div>
                 ))}
               </Box>
             );

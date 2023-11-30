@@ -4,6 +4,7 @@ import { Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App.js";
+import { getNuclDatabaseList } from "./getDatabaseList.js";
 import {
   AlignmentToolForm,
   ProgramSelection,
@@ -73,6 +74,11 @@ function Tblastx() {
   const handleDatabase = (e) => {
     setDatabase(e.target.value);
   };
+  const [databaseList, setDatabaseList] = useState([]);
+  getNuclDatabaseList().then((res) => {
+    setDatabaseList(res);
+    setDatabase(res[0]);
+  });
 
   const defaultValues = {
     tblastx: { ws: 3, ma: "BLOSUM62" },
@@ -245,6 +251,7 @@ function Tblastx() {
           handleSubjectToChange={handleSubjectToChange}
           handleSubjectFile={handleSubjectFile}
           handleDatabase={handleDatabase}
+          databaseList={databaseList}
         />
         <ProgramSelection
           alignmentTool={alignmentTool}

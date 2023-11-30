@@ -4,6 +4,7 @@ import { Box, Button } from "@chakra-ui/react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App.js";
+import { getProtDatabaseList } from "./getDatabaseList";
 import {
   AlignmentToolForm,
   ProgramSelection,
@@ -73,6 +74,11 @@ function Blastx() {
   const handleDatabase = (e) => {
     setDatabase(e.target.value);
   };
+  const [databaseList, setDatabaseList] = useState([]);
+  getProtDatabaseList().then((data) => {
+    setDatabaseList(data);
+    setDatabase(data[0]);
+  });
 
   const defaultValues = {
     blastx: { ws: 5, gc: "[11,1]", ma: "BLOSUM62", ca: "2" },
@@ -256,6 +262,7 @@ function Blastx() {
           handleSubjectToChange={handleSubjectToChange}
           handleSubjectFile={handleSubjectFile}
           handleDatabase={handleDatabase}
+          databaseList={databaseList}
         />
         <ProgramSelection
           alignmentTool={alignmentTool}

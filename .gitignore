@@ -4,6 +4,7 @@
 *.sqlite3
 master.json
 server.json
+database.json
 
 # dependencies
 /node_modules
